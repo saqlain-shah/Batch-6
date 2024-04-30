@@ -1,0 +1,17 @@
+/* Default styles */
+.charts-container {
+    display: flex;
+    justify-content: space-around;
+    padding: 0 20px;
+    box-sizing: border-box;
+  }
+  
+  /* Responsive styles */
+  @media screen and (max-width: 768px) {
+    .charts-container {
+      flex-direction: column; /* Stack charts vertically on small screens */
+      align-items: center; /* Center align charts on small screens */
+      width: 100%;
+    }
+  }
+  
