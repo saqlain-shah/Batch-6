@@ -9,8 +9,8 @@ import {
   ListItemIcon,
   MenuItem,
   Button,
-  Modal,
-  TextField,
+  // Modal,
+  // TextField,
   Typography,
 } from "@mui/material";
 import { Edit, Delete, Visibility } from "@mui/icons-material";
@@ -22,46 +22,46 @@ const User = () => {
   const [hotelList, setHotelList] = useState([]);
   const [id, setId] = useState("");
   const [hotelData, setHotelData] = useState({
-    name: "",
-    city: "",
-    address: "",
-    distance: "",
-    rating: "",
-    cheapestPrice: "",
-    featured: false,
-    type: "",
-    title: "",
-    desc: "",
+    firstName: "",
+    lastName: "",
+    username: "",
+    email: "",
+    isAdmin: true,
+    // cheapestPrice: "",
+    // featured: false,
+    // type: "",
+    // title: "",
+    // desc: "",
   });
 
-  const resetForm = () => {
-    setHotelData({
-      name: "",
-      city: "",
-      address: "",
-      distance: "",
-      rating: "",
-      cheapestPrice: "",
-      featured: false,
-      type: "",
-      title: "",
-      desc: "",
-    });
-  };
-  const handleChange = (event) => {
-    const { name, value, type } = event.target;
-    const newValue = type === "checkbox" ? event.target.checked : value;
-    setHotelData({ ...hotelData, [name]: newValue });
-  };
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  // const resetForm = () => {
+  //   setHotelData({
+  //     name: "",
+  //     city: "",
+  //     address: "",
+  //     distance: "",
+  //     rating: "",
+  //     cheapestPrice: "",
+  //     featured: false,
+  //     type: "",
+  //     title: "",
+  //     desc: "",
+  //   });
+  // };
+  // const handleChange = (event) => {
+  //   const { name, value, type } = event.target;
+  //   const newValue = type === "checkbox" ? event.target.checked : value;
+  //   setHotelData({ ...hotelData, [name]: newValue });
+  // };
+  // const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const handleModalOpen = () => {
-    setIsModalOpen(true);
-  };
+  // // const handleModalOpen = () => {
+  // //   setIsModalOpen(true);
+  // // };
   const fetchHotelData = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:8000/api/hotel/hotels"
+        "http://localhost:8000/api/users"
       );
       setHotelList(response.data);
     } catch (error) {
@@ -69,28 +69,29 @@ const User = () => {
     }
   };
 
-  const handleModalClose = async () => {
-    if (id === "") {
-      //  const {id, ...data}=hotelData
-      await axios.post("http://localhost:8000/api/hotel/", hotelData);
+  // const handleModalClose = async () => {
+  //   if (id === "") {
+  //     //  const {id, ...data}=hotelData
+  //     await axios.post("http://localhost:8000/api/hotel/", hotelData);
 
-      resetForm();
-      setIsModalOpen(false);
-    } else {
-      // console.log("id", id);
-      handleUpdate(id);
-    }
-  };
+  //     resetForm();
+  //     setIsModalOpen(false);
+  //   } else {
+  //     // console.log("id", id);
+  //     
+  //   }
+  // };
+  
   const handleUpdate = async (id) => {
     try {
       console.log("id", id);
 
       await axios
-        .put(`http://localhost:8000/api/hotel/${id}`, hotelData)
+        .put(`http://localhost:8000/api/users/${id}`, hotelData)
         .then(() => {
           resetForm();
           setId("");
-          setIsModalOpen(false);
+          handleUpdate(id);
         });
     } catch (error) {
       console.error("Error updating data:", error);
@@ -104,7 +105,7 @@ const User = () => {
         "Are you sure you want to delete the data?"
       );
       if (confirmDelete) {
-        await axios.delete(`http://localhost:8000/api/hotel/${id}`);
+        await axios.delete(`http://localhost:8000/api/users/${id}`);
       }
     } catch (error) {
       console.log(error);
@@ -118,8 +119,8 @@ const User = () => {
   const columns = useMemo(
     () => [
       {
-        id: "hotels",
-        header: "Hotels",
+        id: "Users-Identities",
+        header: "Users-Identities",
         columns: [
           {
             accessorFn: (row) => row.name,
@@ -146,13 +147,13 @@ const User = () => {
             ),
           },
           {
-            accessorKey: "city",
-            header: "City",
+            accessorKey: "lastName",
+            header: "lastName",
             size: 150,
           },
           {
-            accessorKey: "address",
-            header: "Address",
+            accessorKey: "username",
+            header: "username",
             size: 150,
           },
           // {
@@ -161,20 +162,20 @@ const User = () => {
           //   size: 150,
           // },
           {
-            accessorKey: "rating",
-            header: "Rating",
-            size: 150,
-          },
-          {
-            accessorKey: "cheapestPrice",
-            header: "Cheapest Price ($)",
+            accessorKey: "isAdmin",
+            header: "isAdmin",
             size: 150,
           },
           // {
-          //   accessorKey: "featured",
-          //   header: "Featured",
+          //   accessorKey: "cheapestPrice",
+          //   header: "Cheapest Price ($)",
           //   size: 150,
           // },
+          // // {
+          // //   accessorKey: "featured",
+          // //   header: "Featured",
+          // //   size: 150,
+          // // },
         ],
       },
     ],
@@ -247,7 +248,7 @@ const User = () => {
       <MenuItem
         key="view"
         onClick={() => {
-          Navigate(`/hotel/${params.row.original._id}`);
+          Navigate(`/user/${params.row.original._id}`);
           params.closeMenu();
         }}
         sx={{ m: 0 }}
@@ -264,7 +265,7 @@ const User = () => {
             hotelList.find((item) => item._id === params.row.original._id)
           );
           setId(params.row.original._id);
-          setIsModalOpen(true);
+          // setIsModalOpen(true);
 
           params.closeMenu();
         }}
@@ -294,14 +295,14 @@ const User = () => {
   return (
     <>
       <Box mb={2} textAlign="right">
-        <Button variant="contained" color="primary" onClick={handleModalOpen}>
+        {/* <Button variant="contained" color="primary" onClick={handleModalOpen}>
           ADD NEW+
-        </Button>
+        </Button> */}
       </Box>
       <MaterialReactTable table={table} />
 
       {/* New Hotels Form */}
-      <Modal open={isModalOpen} onClose={handleModalClose}>
+      {/* <Modal open={isModalOpen} onClose={handleModalClose}>
         <Box
           sx={{
             position: "absolute",
@@ -410,15 +411,15 @@ const User = () => {
               onChange={handleChange}
             />
             {/* Other fields */}
-            <Box
+            {/* <Box
               sx={{
                 display: "flex",
                 alignItems: "center",
                 justifyContent: "space-between",
                 gap: "1rem",
               }}
-            >
-              <Button
+            > */} 
+              {/* <Button
                 variant="outlined"
                 color="primary"
                 onClick={() => {
@@ -438,7 +439,7 @@ const User = () => {
             </Box>
           </form>
         </Box>
-      </Modal>
+      </Modal> */}
     </>
   );
 };
