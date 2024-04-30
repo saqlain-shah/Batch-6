@@ -1,81 +1,82 @@
-import React, { useState } from 'react';
-import { useMemo } from 'react';
-import { MaterialReactTable, useMaterialReactTable } from 'material-react-table';
-import { Box, ListItemIcon, MenuItem, Button, Modal, TextField, Typography, IconButton, RadioGroup, Radio, FormControlLabel } from '@mui/material';
-import { Edit, Delete, Close } from '@mui/icons-material';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import * as Yup from 'yup';
-import { data } from './usersData';
+/* eslint-disable react/prop-types */
+import { useMemo } from "react";
+// MRT Imports
+import {
+  MaterialReactTable,
+  useMaterialReactTable,
+} from "material-react-table";
+
+// Material UI Imports
+import { Box, ListItemIcon, MenuItem, } from "@mui/material";
+
+// Icons Imports
+import { Edit, Delete } from "@mui/icons-material";
+
+// Users Data
+import { data } from "./usersData";
 
 const User = () => {
-  const [open, setOpen] = useState(false);
-
-  const handleOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
-
   const columns = useMemo(
     () => [
       {
-        id: 'users',
-        header: 'Users',
+        id: "users", // id used to define `group` column
+        header: "Users",
         columns: [
           {
-            accessorFn: (row) => `${row.firstName} ${row.lastName}`,
-            id: 'name',
-            header: 'Name',
+            accessorFn: (row) => `${row.firstName} ${row.lastName}`, // accessorFn used to join multiple data into a single cell
+            id: "name", // id is still required when using accessorFn instead of accessorKey
+            header: "Name",
             size: 200,
             Cell: ({ renderedCellValue, row }) => (
               <Box
                 sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '1rem',
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "1rem",
                 }}
               >
                 <img
                   alt="avatar"
-                  height={30}
+                  height={50}
                   src={row.original.avatar}
                   loading="lazy"
-                  style={{ borderRadius: '50%' }}
+                  style={{ border: "2px solid teal", borderRadius: "50%" }}
                 />
+                {/* using renderedCellValue instead of cell.getValue() preserves filter match highlighting */}
                 <span>{renderedCellValue}</span>
               </Box>
             ),
           },
           {
-            accessorKey: 'username',
-            header: 'Username',
-            size: 200,
+            accessorKey: "username", 
+            header: "Username",
+            size: 200, 
           },
           {
-            accessorKey: 'email',
+            accessorKey: "email",
             enableClickToCopy: true,
-            filterVariant: 'autocomplete',
-            header: 'Email',
+            filterVariant: "autocomplete",
+            header: "Email",
             size: 300,
           },
           {
-            accessorKey: 'isAdmin',
-            header: 'Is Admin',
-            size: 50,
+            accessorKey: "isAdmin", // Added column for isAdmin
+            header: "Is Admin",
+            size: 50, // Adjust size as needed
             Cell: ({ cell }) => (
               <Box
                 component="span"
                 sx={(theme) => ({
-                  backgroundColor: cell.getValue() ? theme.palette.success.main : theme.palette.error.main,
-                  color: '#fff',
-                  borderRadius: '0.25rem',
-                  padding: '0.25rem',
-                  fontWeight: 'bold',
+                  backgroundColor: cell.getValue()
+                    ? theme.palette.success.main
+                    : theme.palette.error.main,
+                  color: "#fff",
+                  borderRadius: "0.25rem",
+                  padding: "0.25rem",
+                  fontWeight: "bold",
                 })}
               >
-                {cell.getValue() ? 'Yes' : 'No'}
+                {cell.getValue() ? "Yes" : "No"}
               </Box>
             ),
           },
@@ -87,7 +88,7 @@ const User = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data,
+    data, //data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
     enableColumnFilterModes: true,
     enableColumnOrdering: true,
     enableGrouping: true,
@@ -99,40 +100,40 @@ const User = () => {
       showColumnFilters: false,
       showGlobalFilter: true,
       columnPinning: {
-        left: ['mrt-row-expand', 'mrt-row-select'],
-        right: ['mrt-row-actions'],
+        left: ["mrt-row-expand", "mrt-row-select"],
+        right: ["mrt-row-actions"],
       },
     },
-    paginationDisplayMode: 'pages',
-    positionToolbarAlertBanner: 'bottom',
+    paginationDisplayMode: "pages",
+    positionToolbarAlertBanner: "bottom",
     muiSearchTextFieldProps: {
-      size: 'small',
-      variant: 'outlined',
+      size: "small",
+      variant: "outlined",
     },
     muiPaginationProps: {
-      color: 'secondary',
+      color: "secondary",
       rowsPerPageOptions: [5, 10, 15, 20, 25, 30],
-      shape: 'rounded',
-      variant: 'outlined',
+      shape: "rounded",
+      variant: "outlined",
     },
     renderDetailPanel: ({ row }) => (
       <Box
         sx={{
-          alignItems: 'center',
-          display: 'flex',
-          justifyContent: 'space-around',
-          left: '30px',
-          maxWidth: '1000px',
-          position: 'sticky',
-          width: '100%',
+          alignItems: "center",
+          display: "flex",
+          justifyContent: "space-around",
+          left: "30px",
+          maxWidth: "1000px",
+          position: "sticky",
+          width: "100%",
         }}
       >
         <img
           alt="avatar"
-          height={200}
+          height={150}
           src={row.original.avatar}
           loading="lazy"
-          style={{ borderRadius: '50%' }}
+          style={{border: "5px solid teal", borderRadius: "50%" }}
         />
       </Box>
     ),
@@ -167,126 +168,7 @@ const User = () => {
     ],
   });
 
-  const initialValues = {
-    firstName: '',
-    lastName: '',
-    email: '',
-    avatar: '',
-    isAdmin: 'no',
-  };
-
-  const validationSchema = Yup.object().shape({
-    firstName: Yup.string().required('First Name is required'),
-    lastName: Yup.string().required('Last Name is required'),
-    email: Yup.string().email('Invalid email').required('Email is required'),
-    avatar: Yup.string().url('Invalid URL').required('Avatar URL is required'),
-    isAdmin: Yup.string().required('Please select Admin status'),
-  });
-
-  return (
-    <Box position="relative">
-      <Button
-        variant="contained"
-        color="primary"
-        style={{ position: 'relative', top: 0, left: '86%', zIndex: 1 }}
-        onClick={handleOpen}
-      >
-        Create User
-      </Button>
-      <Modal
-        open={open}
-        onClose={handleClose}
-        aria-labelledby="create-user-modal"
-        aria-describedby="create-user-modal-description"
-      >
-        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', boxShadow: 24, p: 4, maxWidth: '90%' }}>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <IconButton onClick={handleClose} aria-label="close">
-              <Close />
-            </IconButton>
-          </Box>
-          <Typography variant="h5" component="div" gutterBottom>
-            Create User
-          </Typography>
-          <Formik
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-            onSubmit={(values, { resetForm }) => {
-              console.log(values);
-              resetForm();
-              handleClose();
-            }}
-          >
-            {({ errors, touched }) => (
-              <Form>
-                <Field
-                  name="firstName"
-                  as={TextField}
-                  label="First Name"
-                  variant="outlined"
-                  fullWidth
-                  margin="normal"
-                  error={touched.firstName && !!errors.firstName}
-                  helperText={touched.firstName && errors.firstName}
-                />
-                <Field
-                  name="lastName"
-                  as={TextField}
-                  label="Last Name"
-                  variant="outlined"
-                  fullWidth
-                  margin="normal"
-                  error={touched.lastName && !!errors.lastName}
-                  helperText={touched.lastName && errors.lastName}
-                />
-                <Field
-                  name="email"
-                  as={TextField}
-                  label="Email"
-                  variant="outlined"
-                  fullWidth
-                  margin="normal"
-                  error={touched.email && !!errors.email}
-                  helperText={touched.email && errors.email}
-                />
-                <Field
-                  name="avatar"
-                  as={TextField}
-                  label="Avatar"
-                  variant="outlined"
-                  fullWidth
-                  margin="normal"
-                  error={touched.avatar && !!errors.avatar}
-                  helperText={touched.avatar && errors.avatar}
-                />
-
-                  <Typography >IsAdmin</Typography>
-                <Field name="isAdmin">
-                  {({ field }) => (
-                   <RadioGroup
-                      {...field}
-                      row
-                     
-                      aria-label="isAdmin"
-                      name="isAdmin"
-                      error={touched.isAdmin && !!errors.isAdmin}
-                    >
-                      <FormControlLabel value="yes" control={<Radio />} label="Yes" />
-                      <FormControlLabel value="no" control={<Radio />} label="No" />
-                    </RadioGroup>
-                  )}
-                </Field>
-                <Button type="submit" variant="contained" color="primary" sx={{ mt: 2 }}>
-                  Create User
-                </Button>
-              </Form>
-            )}
-          </Formik>
-        </Box>
-      </Modal>
-      <MaterialReactTable table={table} />
-    </Box>
-  );
+  return <MaterialReactTable table={table} />;
 };
 
 export default User;
