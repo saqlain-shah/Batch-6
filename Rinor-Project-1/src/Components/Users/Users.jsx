@@ -1,5 +1,6 @@
 /* eslint-disable react/prop-types */
-import { useMemo } from "react";
+import { useState, useEffect, useMemo } from "react"; 
+import axios from "axios";
 // MRT Imports
 import {
   MaterialReactTable,
@@ -13,9 +14,34 @@ import { Box, ListItemIcon, MenuItem, } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 
 // Users Data
-import { data } from "./usersData";
+// import { data } from "./usersData";
 
 const Example = () => {
+
+  const [userList, setUserList] = useState([]);
+  const [id, setId] = useState("");
+  const [userData, setUserData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    isAdmin: true,
+  });
+
+  const fetchUsersData = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/users/"
+      );
+      setUserList(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsersData();
+  }, [userList]);
   const columns = useMemo(
     () => [
       {
@@ -38,7 +64,7 @@ const Example = () => {
                 <img
                   alt="avatar"
                   height={50}
-                  src={row.original.avatar}
+                  src={row.original.photos[0]}
                   loading="lazy"
                   style={{ border: "2px solid teal", borderRadius: "50%" }}
                 />
@@ -46,11 +72,6 @@ const Example = () => {
                 <span>{renderedCellValue}</span>
               </Box>
             ),
-          },
-          {
-            accessorKey: "username", 
-            header: "Username",
-            size: 200, 
           },
           {
             accessorKey: "email",
@@ -88,7 +109,7 @@ const Example = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data, //data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
+    data: userList,
     enableColumnFilterModes: true,
     enableColumnOrdering: true,
     enableGrouping: true,
@@ -131,7 +152,7 @@ const Example = () => {
         <img
           alt="avatar"
           height={150}
-          src={row.original.avatar}
+          src={row.original.photos[0]}
           loading="lazy"
           style={{border: "5px solid teal", borderRadius: "50%" }}
         />
