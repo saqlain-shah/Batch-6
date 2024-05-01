@@ -9,8 +9,8 @@ import {
   ListItemIcon,
   MenuItem,
   Button,
-  // Modal,
-  // TextField,
+  Modal,
+  TextField,
   Typography,
 } from "@mui/material";
 import { Edit, Delete, Visibility } from "@mui/icons-material";
@@ -19,80 +19,64 @@ import { useNavigate } from "react-router-dom";
 
 const User = () => {
   const Navigate = useNavigate();
-  const [hotelList, setHotelList] = useState([]);
+  const [userList, setuserList] = useState([]);
   const [id, setId] = useState("");
-  const [hotelData, setHotelData] = useState({
+  const [userData, setuserData] = useState({
     firstName: "",
     lastName: "",
     username: "",
     email: "",
     isAdmin: true,
-    // cheapestPrice: "",
-    // featured: false,
-    // type: "",
-    // title: "",
-    // desc: "",
   });
 
-  // const resetForm = () => {
-  //   setHotelData({
-  //     name: "",
-  //     city: "",
-  //     address: "",
-  //     distance: "",
-  //     rating: "",
-  //     cheapestPrice: "",
-  //     featured: false,
-  //     type: "",
-  //     title: "",
-  //     desc: "",
-  //   });
-  // };
-  // const handleChange = (event) => {
-  //   const { name, value, type } = event.target;
-  //   const newValue = type === "checkbox" ? event.target.checked : value;
-  //   setHotelData({ ...hotelData, [name]: newValue });
-  // };
-  // const [isModalOpen, setIsModalOpen] = useState(false);
+  const resetForm = () => {
+    setuserData({
+      firstName: "",
+      lastName: "",
+      username: "",
+      email: "",
+      isAdmin: true,
+    });
+  };
+  const handleChange = (event) => {
+    const { name, value, type } = event.target;
+    const newValue = type === "checkbox" ? event.target.checked : value;
+    setuserData({ ...userData, [name]: newValue });
+  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // // const handleModalOpen = () => {
-  // //   setIsModalOpen(true);
-  // // };
-  const fetchHotelData = async () => {
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
+  const fetchuserData = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:8000/api/users"
-      );
-      setHotelList(response.data);
+      const response = await axios.get("http://localhost:8000/api/users");
+      setuserList(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
-  // const handleModalClose = async () => {
-  //   if (id === "") {
-  //     //  const {id, ...data}=hotelData
-  //     await axios.post("http://localhost:8000/api/hotel/", hotelData);
+  const handleModalClose = async () => {
+    if (id === "") {
+      await axios.post("http://localhost:8000/api/users/", userData);
+    } else {
+      await handleUpdate(id); // Call handleUpdate directly
+    }
+    resetForm();
+    setId(""); // Reset id after handling the update or insert
+    setIsModalOpen(false);
+  };
 
-  //     resetForm();
-  //     setIsModalOpen(false);
-  //   } else {
-  //     // console.log("id", id);
-  //     
-  //   }
-  // };
-  
   const handleUpdate = async (id) => {
     try {
       console.log("id", id);
-
-      await axios
-        .put(`http://localhost:8000/api/users/${id}`, hotelData)
-        .then(() => {
-          resetForm();
-          setId("");
-          handleUpdate(id);
-        });
+  
+      await axios.put(`http://localhost:8000/api/users/${id}`, userData);
+      // Reset form and close modal after successful update
+      resetForm();
+      setId("");
+      setIsModalOpen(false);
     } catch (error) {
       console.error("Error updating data:", error);
     }
@@ -113,8 +97,8 @@ const User = () => {
   };
 
   useEffect(() => {
-    fetchHotelData();
-  }, [hotelList]);
+    fetchuserData();
+  }, [userList]);
 
   const columns = useMemo(
     () => [
@@ -124,8 +108,8 @@ const User = () => {
         columns: [
           {
             accessorFn: (row) => row.name,
-            id: "name",
-            header: "Name",
+            id: "firstName",
+            header: "firstName",
             size: 200,
             Cell: ({ renderedCellValue, row }) => (
               <Box
@@ -146,6 +130,11 @@ const User = () => {
               </Box>
             ),
           },
+          // {
+          //   accessorKey: "firstName",
+          //   header: "firstName",
+          //   size: 150,
+          // },
           {
             accessorKey: "lastName",
             header: "lastName",
@@ -156,26 +145,16 @@ const User = () => {
             header: "username",
             size: 150,
           },
-          // {
-          //   accessorKey: "distance",
-          //   header: "Distance",
-          //   size: 150,
-          // },
+          {
+            accessorKey: "email",
+            header: "email",
+            size: 150,
+          },
           {
             accessorKey: "isAdmin",
             header: "isAdmin",
             size: 150,
           },
-          // {
-          //   accessorKey: "cheapestPrice",
-          //   header: "Cheapest Price ($)",
-          //   size: 150,
-          // },
-          // // {
-          // //   accessorKey: "featured",
-          // //   header: "Featured",
-          // //   size: 150,
-          // // },
         ],
       },
     ],
@@ -184,7 +163,7 @@ const User = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data: hotelList,
+    data: userList,
     enableColumnFilterModes: true,
     enableColumnOrdering: true,
     enableGrouping: true,
@@ -261,11 +240,11 @@ const User = () => {
       <MenuItem
         key="edit"
         onClick={() => {
-          setHotelData(
-            hotelList.find((item) => item._id === params.row.original._id)
+          setuserData(
+            userList.find((item) => item._id === params.row.original._id)
           );
           setId(params.row.original._id);
-          // setIsModalOpen(true);
+          setIsModalOpen(true);
 
           params.closeMenu();
         }}
@@ -302,146 +281,101 @@ const User = () => {
       <MaterialReactTable table={table} />
 
       {/* New Hotels Form */}
-      {/* <Modal open={isModalOpen} onClose={handleModalClose}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            width: 400,
-            maxWidth: "90%",
-            maxHeight: "90%",
-            overflowY: "auto",
-          }}
-        >
-          <form>
-            <Typography variant="h5">Add New Hotel</Typography>
+      <Modal open={isModalOpen} onClose={handleModalClose}>
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          bgcolor: "background.paper",
+          boxShadow: 24,
+          p: 4,
+          width: 400,
+          maxWidth: "90%",
+          maxHeight: "90%",
+          overflowY: "auto",
+        }}
+      >
+        <form>
+          <Typography variant="h5">Update User</Typography>
+          <TextField
+            variant="standard"
+            label="firstName"
+            fullWidth
+            margin="normal"
+            name="firstName"
+            value={userData.firstName}
+            onChange={handleChange}
+          />
             <TextField
-              variant="standard"
-              label="Name"
-              fullWidth
-              margin="normal"
-              name="name"
-              value={hotelData.name}
-              onChange={handleChange}
-            />
+            variant="standard"
+            label="lastName"
+            fullWidth
+            margin="normal"
+            name="lastName"
+            value={userData.lastName}
+            onChange={handleChange}
+          />
             <TextField
-              variant="standard"
-              label="City"
-              fullWidth
-              margin="normal"
-              name="city"
-              value={hotelData.city}
-              onChange={handleChange}
-            />
+            variant="standard"
+            label="username"
+            fullWidth
+            margin="normal"
+            name="username"
+            value={userData.username}
+            onChange={handleChange}
+          />
             <TextField
-              variant="standard"
-              label="Address"
-              fullWidth
-              margin="normal"
-              name="address"
-              value={hotelData.address}
-              onChange={handleChange}
-            />
+            variant="standard"
+            label="Email"
+            fullWidth
+            margin="normal"
+            name="email"
+            value={userData.email}
+            onChange={handleChange}
+          />
             <TextField
-              variant="standard"
-              label="Distance"
-              fullWidth
-              margin="normal"
-              name="distance"
-              value={hotelData.distance}
-              onChange={handleChange}
-            />
-            <TextField
-              variant="standard"
-              label="Rating"
-              fullWidth
-              margin="normal"
-              name="rating"
-              value={hotelData.rating}
-              onChange={handleChange}
-            />
-            <TextField
-              variant="standard"
-              label="Cheapest Price"
-              fullWidth
-              margin="normal"
-              name="cheapestPrice"
-              value={hotelData.cheapestPrice}
-              onChange={handleChange}
-            />
-            <TextField
-              variant="standard"
-              label="Featured"
-              fullWidth
-              margin="normal"
-              name="featured"
-              value={hotelData.featured}
-              onChange={handleChange}
-            />
-            <TextField
-              variant="standard"
-              label="Type"
-              fullWidth
-              margin="normal"
-              name="type"
-              value={hotelData.type}
-              onChange={handleChange}
-            />
-            <TextField
-              variant="standard"
-              label="Title"
-              fullWidth
-              margin="normal"
-              name="title"
-              value={hotelData.title}
-              onChange={handleChange}
-            />
-            <TextField
-              variant="standard"
-              label="Description"
-              fullWidth
-              margin="normal"
-              name="desc"
-              value={hotelData.desc}
-              onChange={handleChange}
-            />
-            {/* Other fields */}
-            {/* <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "space-between",
-                gap: "1rem",
+            variant="standard"
+            label="IsAdmin"
+            fullWidth
+            margin="normal"
+            name="isAdmin"
+            value={userData.isAdmin}
+            onChange={handleChange}
+          />
+          {/* Other TextField components */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "1rem",
+            }}
+          >
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => {
+                resetForm();
+                setIsModalOpen(false);
               }}
-            > */} 
-              {/* <Button
-                variant="outlined"
-                color="primary"
-                onClick={() => {
-                  resetForm();
-                  setIsModalOpen(false);
-                }}
-              >
-                Close
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleModalClose}
-              >
-                {id === "" ? "Add Hotel" : "Update Hotel"}
-              </Button>
-            </Box>
-          </form>
-        </Box>
-      </Modal> */}
-    </>
-  );
+            >
+              Close
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleModalClose}
+            >
+              {id === "" ? "Add Hotel" : "Update User"}
+            </Button>
+          </Box>
+        </form>
+      </Box>
+    </Modal>
+  </>
+);
 };
 
 export default User;
