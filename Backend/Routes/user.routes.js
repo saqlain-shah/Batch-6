@@ -22,10 +22,10 @@ router.get("/checkauthentication", verifyToken, (req, res, next) => {
   });
 
 //UPDATE
-router.put("/:id", verifyAdmin, updateUser);
+router.put("/:id",  updateUser);
 
 //DELETE
-router.delete("/:id", verifyAdmin, deleteUser);
+router.delete("/:id", deleteUser);
 
 //GET
 router.get("/:id",  getUser);
