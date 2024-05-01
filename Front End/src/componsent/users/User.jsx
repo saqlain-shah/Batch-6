@@ -1,31 +1,115 @@
 /* eslint-disable react/prop-types */
-import { useMemo } from "react";
-// MRT Imports
+import { useState, useEffect, useMemo } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
 } from "material-react-table";
-
-// Material UI Imports
-import { Box, ListItemIcon, MenuItem, } from "@mui/material";
-
-// Icons Imports
-import { Edit, Delete } from "@mui/icons-material";
-
-// Users Data
-import { data } from "./usersData";
+import {
+  Box,
+  ListItemIcon,
+  MenuItem,
+  Button,
+  Modal,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { Edit, Delete, Visibility } from "@mui/icons-material";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const User = () => {
+  const Navigate = useNavigate();
+  const [userList, setuserList] = useState([]);
+  const [id, setId] = useState("");
+  const [userData, setuserData] = useState({
+    firstName: "",
+    lastName: "",
+    username: "",
+    email: "",
+    isAdmin: true,
+  });
+
+  const resetForm = () => {
+    setuserData({
+      firstName: "",
+      lastName: "",
+      username: "",
+      email: "",
+      isAdmin: true,
+    });
+  };
+  const handleChange = (event) => {
+    const { name, value, type } = event.target;
+    const newValue = type === "checkbox" ? event.target.checked : value;
+    setuserData({ ...userData, [name]: newValue });
+  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleModalOpen = () => {
+    setIsModalOpen(true);
+  };
+  const fetchuserData = async () => {
+    try {
+      const response = await axios.get("http://localhost:8000/api/users");
+      setuserList(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const handleModalClose = async () => {
+    if (id === "") {
+      await axios.post("http://localhost:8000/api/users/", userData);
+    } else {
+      await handleUpdate(id); // Call handleUpdate directly
+    }
+    resetForm();
+    setId(""); // Reset id after handling the update or insert
+    setIsModalOpen(false);
+  };
+
+  const handleUpdate = async (id) => {
+    try {
+      console.log("id", id);
+  
+      await axios.put(`http://localhost:8000/api/users/${id}`, userData);
+      // Reset form and close modal after successful update
+      resetForm();
+      setId("");
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Error updating data:", error);
+    }
+  };
+
+  let handleDelete = async (id) => {
+    // console.log("id", id);
+    try {
+      const confirmDelete = window.confirm(
+        "Are you sure you want to delete the data?"
+      );
+      if (confirmDelete) {
+        await axios.delete(`http://localhost:8000/api/users/${id}`);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchuserData();
+  }, [userList]);
+
   const columns = useMemo(
     () => [
       {
-        id: "users", // id used to define `group` column
-        header: "Users",
+        id: "Users-Identities",
+        header: "Users-Identities",
         columns: [
           {
-            accessorFn: (row) => `${row.firstName} ${row.lastName}`, // accessorFn used to join multiple data into a single cell
-            id: "name", // id is still required when using accessorFn instead of accessorKey
-            header: "Name",
+            accessorFn: (row) => row.name,
+            id: "firstName",
+            header: "firstName",
             size: 200,
             Cell: ({ renderedCellValue, row }) => (
               <Box
@@ -38,47 +122,38 @@ const User = () => {
                 <img
                   alt="avatar"
                   height={50}
-                  src={row.original.avatar}
+                  src={row.original.photos[0]}
                   loading="lazy"
-                  style={{ border: "2px solid teal", borderRadius: "50%" }}
+                  style={{ border: "2px solid teal", borderRadius: "5px" }}
                 />
-                {/* using renderedCellValue instead of cell.getValue() preserves filter match highlighting */}
                 <span>{renderedCellValue}</span>
               </Box>
             ),
           },
+          // {
+          //   accessorKey: "firstName",
+          //   header: "firstName",
+          //   size: 150,
+          // },
           {
-            accessorKey: "username", 
-            header: "Username",
-            size: 200, 
+            accessorKey: "lastName",
+            header: "lastName",
+            size: 150,
+          },
+          {
+            accessorKey: "username",
+            header: "username",
+            size: 150,
           },
           {
             accessorKey: "email",
-            enableClickToCopy: true,
-            filterVariant: "autocomplete",
-            header: "Email",
-            size: 300,
+            header: "email",
+            size: 150,
           },
           {
-            accessorKey: "isAdmin", // Added column for isAdmin
-            header: "Is Admin",
-            size: 50, // Adjust size as needed
-            Cell: ({ cell }) => (
-              <Box
-                component="span"
-                sx={(theme) => ({
-                  backgroundColor: cell.getValue()
-                    ? theme.palette.success.main
-                    : theme.palette.error.main,
-                  color: "#fff",
-                  borderRadius: "0.25rem",
-                  padding: "0.25rem",
-                  fontWeight: "bold",
-                })}
-              >
-                {cell.getValue() ? "Yes" : "No"}
-              </Box>
-            ),
+            accessorKey: "isAdmin",
+            header: "isAdmin",
+            size: 150,
           },
         ],
       },
@@ -88,7 +163,7 @@ const User = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data, //data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
+    data: userList,
     enableColumnFilterModes: true,
     enableColumnOrdering: true,
     enableGrouping: true,
@@ -96,6 +171,7 @@ const User = () => {
     enableFacetedValues: true,
     enableRowActions: true,
     enableRowSelection: true,
+    getRowId: (row) => row.id,
     initialState: {
       showColumnFilters: false,
       showGlobalFilter: true,
@@ -121,28 +197,56 @@ const User = () => {
         sx={{
           alignItems: "center",
           display: "flex",
-          justifyContent: "space-around",
-          left: "30px",
-          maxWidth: "1000px",
-          position: "sticky",
-          width: "100%",
+          flexDirection: "column",
+          justifyContent: "center",
+          padding: "16px",
+          textAlign: "center",
+          maxWidth: "100%",
         }}
       >
         <img
           alt="avatar"
-          height={150}
-          src={row.original.avatar}
+          src={row.original.photos[0]}
           loading="lazy"
-          style={{border: "5px solid teal", borderRadius: "50%" }}
+          style={{
+            maxWidth: "100%",
+            height: "auto",
+            border: "2px solid teal",
+            borderRadius: "5px",
+            marginBottom: "16px",
+          }}
         />
+        <Typography variant="h5" sx={{ marginBottom: "8px" }}>
+          {row.original.title}
+        </Typography>
+        <Typography variant="body1">{row.original.desc}</Typography>
       </Box>
     ),
-    renderRowActionMenuItems: ({ closeMenu, table }) => [
+
+    renderRowActionMenuItems: (params) => [
+      <MenuItem
+        key="view"
+        onClick={() => {
+          Navigate(`/user/${params.row.original._id}`);
+          params.closeMenu();
+        }}
+        sx={{ m: 0 }}
+      >
+        <ListItemIcon>
+          <Visibility />
+        </ListItemIcon>
+        View
+      </MenuItem>,
       <MenuItem
         key="edit"
         onClick={() => {
-          // Edit logic...
-          closeMenu();
+          setuserData(
+            userList.find((item) => item._id === params.row.original._id)
+          );
+          setId(params.row.original._id);
+          setIsModalOpen(true);
+
+          params.closeMenu();
         }}
         sx={{ m: 0 }}
       >
@@ -154,9 +258,8 @@ const User = () => {
       <MenuItem
         key="delete"
         onClick={() => {
-          const selectedRows = table.getSelectedRowModel().flatRows;
-          selectedRows.forEach((row) => table.deleteRow(row.id));
-          closeMenu();
+          handleDelete(params.row.original._id);
+          params.closeMenu();
         }}
         sx={{ m: 0 }}
       >
@@ -168,7 +271,111 @@ const User = () => {
     ],
   });
 
-  return <MaterialReactTable table={table} />;
+  return (
+    <>
+      <Box mb={2} textAlign="right">
+        {/* <Button variant="contained" color="primary" onClick={handleModalOpen}>
+          ADD NEW+
+        </Button> */}
+      </Box>
+      <MaterialReactTable table={table} />
+
+      {/* New Hotels Form */}
+      <Modal open={isModalOpen} onClose={handleModalClose}>
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          bgcolor: "background.paper",
+          boxShadow: 24,
+          p: 4,
+          width: 400,
+          maxWidth: "90%",
+          maxHeight: "90%",
+          overflowY: "auto",
+        }}
+      >
+        <form>
+          <Typography variant="h5">Update User</Typography>
+          <TextField
+            variant="standard"
+            label="firstName"
+            fullWidth
+            margin="normal"
+            name="firstName"
+            value={userData.firstName}
+            onChange={handleChange}
+          />
+            <TextField
+            variant="standard"
+            label="lastName"
+            fullWidth
+            margin="normal"
+            name="lastName"
+            value={userData.lastName}
+            onChange={handleChange}
+          />
+            <TextField
+            variant="standard"
+            label="username"
+            fullWidth
+            margin="normal"
+            name="username"
+            value={userData.username}
+            onChange={handleChange}
+          />
+            <TextField
+            variant="standard"
+            label="Email"
+            fullWidth
+            margin="normal"
+            name="email"
+            value={userData.email}
+            onChange={handleChange}
+          />
+            <TextField
+            variant="standard"
+            label="IsAdmin"
+            fullWidth
+            margin="normal"
+            name="isAdmin"
+            value={userData.isAdmin}
+            onChange={handleChange}
+          />
+          {/* Other TextField components */}
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: "1rem",
+            }}
+          >
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => {
+                resetForm();
+                setIsModalOpen(false);
+              }}
+            >
+              Close
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={handleModalClose}
+            >
+              {id === "" ? "Add Hotel" : "Update User"}
+            </Button>
+          </Box>
+        </form>
+      </Box>
+    </Modal>
+  </>
+);
 };
 
 export default User;
