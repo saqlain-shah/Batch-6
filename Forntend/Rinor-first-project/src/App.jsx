@@ -32,7 +32,7 @@ import LogoImage from "./assets/logo.png";
 import LoginForm from "./Verification/Login";
 import RegisterForm from "./Verification/Register";
 import Singlehotel from "./Hotel_Management/Hotels/SingleHotel";
-import SingleUsers from "./Hotel_Management/Users/makeData";
+import SingleUsers from "./Hotel_Management/Users/SingleUsers";
 /////<<<<<<<<<<<<<< Various Imports >>>>>>>>>>>>>>/////
 const drawerWidth = 240;
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })(
