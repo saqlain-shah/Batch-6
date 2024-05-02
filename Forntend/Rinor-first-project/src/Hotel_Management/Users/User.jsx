@@ -16,6 +16,7 @@ import {
 import { Edit, Delete, Visibility } from "@mui/icons-material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { Checkbox, FormControlLabel } from "@mui/material";
 
 const User = () => {
   const Navigate = useNavigate();
@@ -71,7 +72,7 @@ const User = () => {
   const handleUpdate = async (id) => {
     try {
       console.log("id", id);
-  
+
       await axios.put(`http://localhost:8000/api/users/${id}`, userData);
       // Reset form and close modal after successful update
       resetForm();
@@ -107,9 +108,9 @@ const User = () => {
         header: "Users-Identities",
         columns: [
           {
-            accessorFn: (row) => row.name,
+            accessorKey: "firstName",
             id: "firstName",
-            header: "firstName",
+            header: "First Name",
             size: 200,
             Cell: ({ renderedCellValue, row }) => (
               <Box
@@ -130,28 +131,24 @@ const User = () => {
               </Box>
             ),
           },
-          // {
-          //   accessorKey: "firstName",
-          //   header: "firstName",
-          //   size: 150,
-          // },
           {
             accessorKey: "lastName",
-            header: "lastName",
+            header: "Last Name",
             size: 150,
           },
           {
             accessorKey: "username",
-            header: "username",
+            header: "Username",
             size: 150,
           },
           {
             accessorKey: "email",
-            header: "email",
+            header: "Email",
             size: 150,
           },
           {
-            accessorKey: "isAdmin",
+            accessorFn: (row) => (row.isAdmin ? "Yes" : "No"),
+            id: "isAdmin",
             header: "isAdmin",
             size: 150,
           },
@@ -282,100 +279,111 @@ const User = () => {
 
       {/* New Hotels Form */}
       <Modal open={isModalOpen} onClose={handleModalClose}>
-      <Box
-        sx={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          bgcolor: "background.paper",
-          boxShadow: 24,
-          p: 4,
-          width: 400,
-          maxWidth: "90%",
-          maxHeight: "90%",
-          overflowY: "auto",
-        }}
-      >
-        <form>
-          <Typography variant="h5">Update User</Typography>
-          <TextField
-            variant="standard"
-            label="firstName"
-            fullWidth
-            margin="normal"
-            name="firstName"
-            value={userData.firstName}
-            onChange={handleChange}
-          />
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            width: 400,
+            maxWidth: "90%",
+            maxHeight: "90%",
+            overflowY: "auto",
+          }}
+        >
+          <form>
+            <Typography variant="h5">Update User</Typography>
             <TextField
-            variant="standard"
-            label="lastName"
-            fullWidth
-            margin="normal"
-            name="lastName"
-            value={userData.lastName}
-            onChange={handleChange}
-          />
+              variant="standard"
+              label="firstName"
+              fullWidth
+              margin="normal"
+              name="firstName"
+              value={userData.firstName}
+              onChange={handleChange}
+            />
             <TextField
-            variant="standard"
-            label="username"
-            fullWidth
-            margin="normal"
-            name="username"
-            value={userData.username}
-            onChange={handleChange}
-          />
+              variant="standard"
+              label="lastName"
+              fullWidth
+              margin="normal"
+              name="lastName"
+              value={userData.lastName}
+              onChange={handleChange}
+            />
             <TextField
-            variant="standard"
-            label="Email"
-            fullWidth
-            margin="normal"
-            name="email"
-            value={userData.email}
-            onChange={handleChange}
-          />
+              variant="standard"
+              label="username"
+              fullWidth
+              margin="normal"
+              name="username"
+              value={userData.username}
+              onChange={handleChange}
+            />
             <TextField
-            variant="standard"
-            label="IsAdmin"
-            fullWidth
-            margin="normal"
-            name="isAdmin"
-            value={userData.isAdmin}
-            onChange={handleChange}
-          />
-          {/* Other TextField components */}
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "1rem",
-            }}
-          >
-            <Button
-              variant="outlined"
-              color="primary"
-              onClick={() => {
-                resetForm();
-                setIsModalOpen(false);
+              variant="standard"
+              label="Email"
+              fullWidth
+              margin="normal"
+              name="email"
+              value={userData.email}
+              onChange={handleChange}
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={userData.isAdmin}
+                  onChange={handleChange}
+                  name="isAdmin"
+                />
+              }
+              label="Yes"
+            />
+             <FormControlLabel
+              control={
+                <Checkbox
+                  checked={!userData.isAdmin}
+                  onChange={(e)=>handleChange({...e,target:{name:"isAdmin", value:!userData.isAdmin}})}
+                  name="isAdmin"
+                />
+              }
+              label="No"
+            />
+            {/* Other TextField components */}
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "1rem",
               }}
             >
-              Close
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleModalClose}
-            >
-              {id === "" ? "Add Hotel" : "Update User"}
-            </Button>
-          </Box>
-        </form>
-      </Box>
-    </Modal>
-  </>
-);
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => {
+                  resetForm();
+                  setIsModalOpen(false);
+                }}
+              >
+                Close
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleModalClose}
+              >
+                {id === "" ? "Add Hotel" : "Update User"}
+              </Button>
+            </Box>
+          </form>
+        </Box>
+      </Modal>
+    </>
+  );
 };
 
 export default User;

@@ -12,10 +12,10 @@ const SingleUsers = () => {
     isAdmin: true,
   });
   const params = useParams();
-  const fetchHotelData = async (params) => {
+  const fetchuserData = async (params) => {
     try {
       await axios
-        .get(`http://localhost:8000/api/users/:${params.id}`)
+        .get(`http://localhost:8000/api/users/${params.id}`)
         .then((res) => {
           setData(res.data);
         });
@@ -24,7 +24,7 @@ const SingleUsers = () => {
     }
   };
   useEffect(() => {
-    fetchHotelData(params);
+    fetchuserData(params);
   }, []);
   return (
     <Card style={{ width: '50%', marginTop: '3%', marginLeft:'10%' }}>
@@ -48,7 +48,7 @@ const SingleUsers = () => {
         email: {data.email}
         </Typography>
         <Typography variant="body2" component="p">
-        isAdmin: {data.isAdmin}
+        isAdmin: {data.isAdmin ? "Yes": "NO"}
         </Typography>
         {/* <Typography variant="body2" component="p">
           Description: {data.desc}
