@@ -1,9 +1,17 @@
 import User from "../Model/User.js";
+import mongoose from 'mongoose';
+
+const { ObjectId } = mongoose.Types;
 
 export const updateUser = async (req, res, next) => {
   try {
+    const userId = req.params.id;
+    if (!ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid user ID." });
+    }
+
     const { password, ...updatedUser } = await User.findByIdAndUpdate(
-      req.params.id,
+      userId,
       { $set: req.body },
       { new: true }
     );
@@ -15,9 +23,15 @@ export const updateUser = async (req, res, next) => {
     next(err);
   }
 };
+
 export const deleteUser = async (req, res, next) => {
   try {
-    const deletedUser = await User.findByIdAndDelete(req.params.id);
+    const userId = req.params.id;
+    if (!ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "Invalid user ID." });
+    }
+
+    const deletedUser = await User.findByIdAndDelete(userId);
     if (!deletedUser) {
       return res.status(404).json({ message: "User not found." });
     }
@@ -41,6 +55,9 @@ export const getUser = async (req, res, next) => {
   }
 };
 export const getUsers = async (req, res, next) => {
+  // // console.log("Request Queries", req.query);
+  // const { min, max, ...others } = req.query;
+
   try {
     const users = await User.find();
     res.status(200).json(users);
