@@ -17,6 +17,10 @@ const RoomSchema = new mongoose.Schema(
             type: String,
            
         },
+        
+        photos: {
+            type: [String],
+          },
         // roomNumbers: [{number : Number, unavailableDates: {type : [Date]}}],
     },
     {timestamps: true}

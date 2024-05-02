@@ -1,7 +1,5 @@
 import Room from "../Model/room.model.js";
 import Hotel from "../Model/hotel.Model.js";
-//import { CreateError } from "../Utils/Error.js";
-import mongoose from "mongoose";
 
 export const createRoom = async (req, res, next) => {
   const hotelId = req.params.hotelid;
@@ -22,7 +20,6 @@ export const createRoom = async (req, res, next) => {
   }
 };
 
-//UPDATE
 export const updateRoom = async (req, res, next) => {
   try {
     const updatedRoom = await Room.findByIdAndUpdate(
@@ -35,55 +32,50 @@ export const updateRoom = async (req, res, next) => {
     next(err);
   }
 };
-//DELETE
-export const deleteRoom = async (req, res, next) => {
-  const roomId = req.params.roomid;
-  const hotelId = req.params.hotelid;
-
-  if (!mongoose.Types.ObjectId.isValid(roomId)) {
-    res.status(400).json({
-      status: false,
-      message: `Hotel ID ${roomId} does not matched`,
-    });
-  }
+export const updateRoomAvailability = async (req, res, next) => {
   try {
-    const deletedRoom = await Room.findByIdAndDelete(roomId);
-
-    if(!deletedRoom){
-      return res.status(404).json({message: "room not found"})
-    }
-    //Remove the room from the hotel room array
-    await Hotel.findByIdAndUpdate(
-      hotelId,
-      { $pull: { rooms: { _id: deletedRoom._id }} },
+    await Room.updateOne(
+      { "roomNumbers._id": req.params.id },
+      {
+        $push: {
+          "roomNumbers.$.unavailableDates": req.body.dates,
+        },
+      }
     );
-    res.status(200).json({
-      status: true,
-      message: `Room ID ${roomId} deleted succesfully`,
-    });
+    res.status(200).json("Room status has been updated.");
   } catch (err) {
-    console.error(err);p
     next(err);
   }
 };
-
-//GET ROOM
-// export const getRoom = async (req, res, next) => {
-//   const RoomId = req.params.id;
-//   //check the room id with database id
-//   if (!mongoose.Types.ObjectId.isValid(RoomId)) {
-//     res
-//       .status(400)
-//       .json({ status: false, message: `Your Room ID ${RoomId} does'nt match` });
-//   }
-//   try {
-//     const room = await Room.findById(req.params.id);
-//     res.status(200).json({
-//       status: true,
-//       message: `Room ID matched`,
-//       date: room,
-//     });
-//   } catch (err) {
-//     next(err);
-//   }
-// };
+export const deleteRoom = async (req, res, next) => {
+  const hotelId = req.params.hotelid;
+  try {
+    await Room.findByIdAndDelete(req.params.id);
+    try {
+      await Hotel.findByIdAndUpdate(hotelId, {
+        $pull: { rooms: req.params.id },
+      });
+    } catch (err) {
+      next(err);
+    }
+    res.status(200).json("Room has been deleted.");
+  } catch (err) {
+    next(err);
+  }
+};
+export const getRoom = async (req, res, next) => {
+  try {
+    const room = await Room.findById(req.params.id);
+    res.status(200).json(room);
+  } catch (err) {
+    next(err);
+  }
+};
+export const getRooms = async (req, res, next) => {
+  try {
+    const rooms = await Room.find();
+    res.status(200).json(rooms);
+  } catch (err) {
+    next(err);
+  }
+};
