@@ -1,5 +1,8 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect, useMemo } from "react";
+
+
+import {  FormControlLabel } from "@mui/material";
 import {
   MaterialReactTable,
   useMaterialReactTable,
@@ -12,6 +15,7 @@ import {
   Modal,
   TextField,
   Typography,
+  Checkbox,
 } from "@mui/material";
 import { Edit, Delete, Visibility } from "@mui/icons-material";
 import axios from "axios";
@@ -51,6 +55,7 @@ const User = () => {
   const fetchuserData = async () => {
     try {
       const response = await axios.get("http://localhost:8000/api/users");
+      console.log(response.data)
       setuserList(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -90,6 +95,7 @@ const User = () => {
       );
       if (confirmDelete) {
         await axios.delete(`http://localhost:8000/api/users/${id}`);
+        console.log("done delete");
       }
     } catch (error) {
       console.log(error);
@@ -98,7 +104,7 @@ const User = () => {
 
   useEffect(() => {
     fetchuserData();
-  }, [userList]);
+  }, []);
 
   const columns = useMemo(
     () => [
@@ -107,8 +113,10 @@ const User = () => {
         header: "Users-Identities",
         columns: [
           {
-            accessorFn: (row) => row.name,
+            accessorKey:"firstName",
+           
             id: "firstName",
+          
             header: "firstName",
             size: 200,
             Cell: ({ renderedCellValue, row }) => (
@@ -151,8 +159,9 @@ const User = () => {
             size: 150,
           },
           {
-            accessorKey: "isAdmin",
-            header: "isAdmin",
+            accessorFn: (row) => row.isAdmin ? "Yes" : "No",
+            id: "isAdmin",
+            header: "Is Admin",
             size: 150,
           },
         ],
@@ -335,15 +344,26 @@ const User = () => {
             value={userData.email}
             onChange={handleChange}
           />
-            <TextField
-            variant="standard"
-            label="IsAdmin"
-            fullWidth
-            margin="normal"
-            name="isAdmin"
-            value={userData.isAdmin}
-            onChange={handleChange}
-          />
+          <FormControlLabel
+              control={
+                <Checkbox
+                  checked={userData.isAdmin}
+                  onChange={handleChange}
+                  name="isAdmin"
+                />
+              }
+              label="Yes"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={!userData.isAdmin}
+                  onChange={(e) => handleChange({ ...e, target: { name: "isAdmin", value: !userData.isAdmin } })}
+                  name="isAdmin"
+                />
+              }
+              label="No"
+            />
           {/* Other TextField components */}
           <Box
             sx={{

@@ -29,6 +29,7 @@ import RegisterForm from './componsent/LoginRegister/Register';
 import SingleHotel from "./componsent/Hotels/SingleHotel";
 import Booking from './componsent/Booking/Booking';
 import User from './componsent/users/User';
+import SingleUser from "./componsent/users/SingleUser";
 // import SingleHotel from "./Components/Hotels/SingleHotel.jsx";
 // import './style.css';
 
@@ -205,6 +206,7 @@ function App() {
             <Route path="/login" element={<LoginForm />} />
   <Route path="/register" element={<RegisterForm />} />
   <Route path='/hotel/:id' element={<SingleHotel />} />
+  <Route path='/users/:id' element={<SingleUser />} />
           </Routes>
         </Main>
       </Box>

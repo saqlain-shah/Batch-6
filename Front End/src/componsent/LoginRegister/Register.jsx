@@ -24,6 +24,7 @@ const RegisterForm = () => {
   const initialValues = {
     firstName: '',
     lastName: '',
+    username:'',
     email: '',
     password: '',
     confirmPassword: '',
@@ -84,6 +85,19 @@ const RegisterForm = () => {
               onBlur={formik.handleBlur}
               error={formik.touched.lastName && Boolean(formik.errors.lastName)}
               helperText={formik.touched.lastName && formik.errors.lastName}
+              margin="normal"
+            />
+            <TextField
+              label=" username"
+              variant="outlined"
+              fullWidth
+              size="small"
+              name="username"
+              value={formik.values.username}
+              onChange={formik.handleChange}
+              onBlur={formik.handleBlur}
+              error={formik.touched.username && Boolean(formik.errors.username)}
+              helperText={formik.touched.username && formik.errors.username}
               margin="normal"
             />
             <TextField
