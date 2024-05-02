@@ -29,7 +29,7 @@ const RegisterForm = () => {
   });
   /////<<<<<<<< Initial form values >>>>>>>>//////
   const initialValues = {
-    name: "",
+    firstName: "",
     lastName: "",
     username: "",
     email: "",
