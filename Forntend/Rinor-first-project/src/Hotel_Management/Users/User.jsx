@@ -241,7 +241,8 @@ const User = () => {
             userList.find((item) => item._id === params.row.original._id)
           );
           setId(params.row.original._id);
-          setIsModalOpen(true);
+          // setIsModalOpen(true);
+          handleModalOpen();
 
           params.closeMenu();
         }}
