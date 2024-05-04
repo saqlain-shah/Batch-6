@@ -18,7 +18,7 @@ import { Edit, Delete, Visibility } from "@mui/icons-material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const Example = () => {
+const Hotel = () => {
   const Navigate = useNavigate();
   const [hotelList, setHotelList] = useState([]);
   const [id, setId] = useState("");
@@ -444,4 +444,4 @@ const Example = () => {
   );
 };
 
-export default Example;
+export default Hotel;
