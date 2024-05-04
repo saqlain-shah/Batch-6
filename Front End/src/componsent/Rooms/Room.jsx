@@ -32,12 +32,13 @@ const Room = () => {
   const resetForm = () => {
     setroomData({
       title: "",
-    price: "",
-    maxPeople: "",
-    desc: "",
-    
+      price: "",
+      maxPeople: "",
+      desc: "",
+      hotelId: "", // Reset the hotelId field as well
     });
   };
+
   const handleChange = (event) => {
     const { name, value, type } = event.target;
     const newValue = type === "checkbox" ? event.target.checked : value;
@@ -52,31 +53,47 @@ const Room = () => {
     try {
       const response = await axios.get(
         "http://localhost:8000/api/room"
+
       );
       setroomList(response.data);
+      console.log(response.data)
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
   const handleModalClose = async () => {
-    if (id === "") {
-      //  const {id, ...data}=roomData
-      await axios.post("http://localhost:8000/api/room/", roomData);
+    const { hotelId } = roomData; // Destructure hotelId from roomData
 
-      resetForm();
-      setIsModalOpen(false);
+    if (id === "") {
+      // If id is empty, it means we are creating a new room
+      try {
+        // Add hotelId to the roomData object
+        const dataWithHotelId = { ...roomData };
+        
+        // Make a POST request to create a new room
+        await axios.post(`http://localhost:8000/api/room/${hotelId}`, dataWithHotelId);
+        
+        // Reset the form fields and close the modal
+             resetForm();
+        setIsModalOpen(false);
+      } catch (error) {
+        // Handle any errors that occur during the POST request
+        console.error("Error creating new room:", error);
+      }
     } else {
-      // console.log("id", id);
+      // If id is not empty, it means we are updating an existing room
       handleUpdate(id);
     }
   };
+
+  
   const handleUpdate = async (id) => {
     try {
       console.log("id", id);
 
       await axios
-        .put(`http://localhost:8000//:id/:${id}`, roomData)
+        .put(`http://localhost:8000/api/room/${id}`, roomData)
         .then(() => {
           resetForm();
           setId("");
@@ -87,23 +104,32 @@ const Room = () => {
     }
   };
 
-  let handleDelete = async (id) => {
-    // console.log("id", id);
+  const handleDelete = async (id, hotelId) => {
     try {
-      const confirmDelete = window.confirm(
-        "Are you sure you want to delete the data?"
-      );
+      const confirmDelete = window.confirm("Are you sure you want to delete the room?");
       if (confirmDelete) {
-        await axios.delete(`http://localhost:8000/api/room/${id}`);
+        // Send DELETE request to delete the room
+        await axios.delete(`http://localhost:8000/api/room/${id}/${hotelId}`);
+        console.log("Room with ID", id, "in hotel with ID", hotelId, "deleted successfully.");
+        
+        // Update local state to remove the deleted room
+        setroomList(prevRoomList => prevRoomList.filter(room => room._id !== id));
       }
     } catch (error) {
-      console.log(error);
+      // Log any errors that occur during the delete request
+      console.error("Error deleting room:", error);
     }
   };
+  
+  
+  
+  
+  
+  
 
   useEffect(() => {
     fetchroomData();
-  }, [roomList]);
+  }, []);
 
   const columns = useMemo(
     () => [
@@ -253,13 +279,13 @@ const Room = () => {
         Edit
       </MenuItem>,
       <MenuItem
-        key="delete"
-        onClick={() => {
-          handleDelete(params.row.original._id);
-          params.closeMenu();
-        }}
-        sx={{ m: 0 }}
-      >
+      key="delete"
+      onClick={() => {
+        handleDelete(params.row.original._id, params.row.original.hotelId);
+        params.closeMenu();
+      }}
+      sx={{ m: 0 }}
+    >
         <ListItemIcon>
           <Delete />
         </ListItemIcon>
