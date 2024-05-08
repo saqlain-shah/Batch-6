@@ -1,5 +1,5 @@
 import User from "../Model/User.js";
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const { ObjectId } = mongoose.Types;
 
@@ -36,12 +36,10 @@ export const deleteUser = async (req, res, next) => {
       return res.status(404).json({ message: "User not found." });
     }
     const { password, ...deletedUserDetails } = deletedUser._doc;
-    res
-      .status(200)
-      .json({
-        message: "User has been deleted.",
-        userDetails: { ...deletedUserDetails },
-      });
+    res.status(200).json({
+      message: "User has been deleted.",
+      userDetails: { ...deletedUserDetails },
+    });
   } catch (err) {
     next(err);
   }
