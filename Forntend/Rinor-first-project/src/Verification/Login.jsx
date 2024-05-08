@@ -1,12 +1,11 @@
 /* eslint-disable react/no-unescaped-entities */
-import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Grid, Box, TextField, Button, Modal, Typography } from '@mui/material';
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { Grid, Box, TextField, Button, Modal, Typography } from "@mui/material";
+import { useFormik } from "formik";
+import * as Yup from "yup";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
   const navigate = useNavigate();
@@ -14,18 +13,18 @@ const LoginForm = () => {
 
   // Validation schema using Yup
   const validationSchema = Yup.object().shape({
-    username: Yup.string().required('Username is required'),
-    email: Yup.string().email('Invalid email').required('Email is required'),
+    username: Yup.string().required("Username is required"),
+    email: Yup.string().email("Invalid email").required("Email is required"),
     password: Yup.string()
-  .min(6, 'Password must be at least 6 characters')
-  .required('Password is required'),
+      .min(6, "Password must be at least 6 characters")
+      .required("Password is required"),
   });
 
   // Initial form values
   const initialValues = {
-    username: '',
-    email: '',
-    password: '',
+    username: "",
+    email: "",
+    password: "",
   };
 
   const formik = useFormik({
@@ -39,7 +38,7 @@ const LoginForm = () => {
         );
         console.log(response.data);
         resetForm();
-        navigate('/');  // Navigate to the dashboard or any other route after successful login
+        navigate("/"); // Navigate to the dashboard or any other route after successful login
       } catch (error) {
         console.error("Error:", error);
       }
@@ -95,14 +94,31 @@ const LoginForm = () => {
               margin="normal"
             />
 
-            <Button type="submit" variant="contained" color="primary" fullWidth sx={{ marginTop: 2 }}>
+            <Button
+              type="submit"
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ marginTop: 2 }}
+            >
               Submit
             </Button>
           </form>
         </Box>
       </Grid>
       <Modal open={isModalOpen} onClose={() => setIsModalOpen(false)}>
-        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', bgcolor: 'background.paper', boxShadow: 24, p: 4, maxWidth: '80%' }}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            maxWidth: "80%",
+          }}
+        >
           <Typography variant="h5" gutterBottom>
             Submitted Data
           </Typography>

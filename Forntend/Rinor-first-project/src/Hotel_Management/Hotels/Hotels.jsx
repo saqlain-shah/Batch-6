@@ -110,7 +110,6 @@ const hotels = () => {
       console.log(error);
     }
   };
-
   useEffect(() => {
     fetchHotelData();
   }, [hotelList]);
