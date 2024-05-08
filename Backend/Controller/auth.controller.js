@@ -5,12 +5,20 @@ import jwt from "jsonwebtoken";
 //          REGISTER              ||
 //================================||
 const register = async (req, res, next) => {
-  try {
-    const salt = bcrypt.genSaltSync(10);
-    const hash = bcrypt.hashSync(req.body.password, salt);
+  console.log("req", req.body);
+  const { firstName, lastName, email, password } = req.body;
+  console.log("body", firstName, lastName, email, password);
+  const file = req.file;
+  // if (!file) return res.send("failed to upload image");
 
+  try {
+    // console.log("body", req.body, req.file);
+    const salt = bcrypt.genSaltSync(10);
+    const hash = bcrypt.hashSync(password, salt);
+    
     const newUser = new User({
       ...req.body,
+      photo: file ? file.path : "",
       password: hash,
     });
 
@@ -21,7 +29,6 @@ const register = async (req, res, next) => {
     });
 
     console.log("Api successfully trigerred");
-    
   } catch (err) {
     console.log("Api does not trigerred");
     console.log(err);
@@ -75,6 +82,5 @@ const login = async (req, res, next) => {
     next(err);
   }
 };
-
 
 export { register, login };

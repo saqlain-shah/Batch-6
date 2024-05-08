@@ -51,7 +51,12 @@ const Hotel = () => {
   };
   const handleChange = (event) => {
     const { name, value, type } = event.target;
-    const newValue = type === "checkbox" ? event.target.checked : value;
+    const newValue =
+      type === "checkbox"
+        ? event.target.checked
+        : type === "file"
+        ? event.target.files[0] // Get the file object from the event
+        : value;
     setHotelData({ ...hotelData, [name]: newValue });
   };
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -64,6 +69,8 @@ const Hotel = () => {
       const response = await axios.get(
         "http://localhost:8000/api/hotels/hotels"
       );
+      console.log("data", response.data);
+
       setHotelList(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -72,8 +79,12 @@ const Hotel = () => {
 
   const handleModalClose = async () => {
     if (id === "") {
+      const formData = new FormData();
+      Object.entries(hotelData).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
       //  const {id, ...data}=hotelData
-      await axios.post("http://localhost:8000/api/hotels/", hotelData);
+      await axios.post("http://localhost:8000/api/hotels/", formData);
 
       resetForm();
       setIsModalOpen(false);
@@ -135,11 +146,12 @@ const Hotel = () => {
                   gap: "1rem",
                 }}
               >
+                {}
                 <img
                   alt="avatar"
                   height={50}
-                  src={row.original.photos[0]}
-                  loading="lazy"
+                  src={window.URL.createObjectURL(row.original.photos)}
+                  // loading="lazy"
                   style={{ border: "2px solid teal", borderRadius: "5px" }}
                 />
                 <span>{renderedCellValue}</span>
@@ -227,7 +239,7 @@ const Hotel = () => {
       >
         <img
           alt="avatar"
-          src={row.original.photos[0]}
+          src={row.original.photos}
           loading="lazy"
           style={{
             maxWidth: "100%",
@@ -410,6 +422,8 @@ const Hotel = () => {
               value={hotelData.desc}
               onChange={handleChange}
             />
+            <input type="file" name="photos" onChange={handleChange} />
+
             {/* Other fields */}
             <Box
               sx={{

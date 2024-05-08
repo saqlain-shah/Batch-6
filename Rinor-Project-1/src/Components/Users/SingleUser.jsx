@@ -17,7 +17,7 @@ const SingleUser = () => {
       await axios
         .get(`http://localhost:8000/api/users/${params.id}`)
         .then((res) => {
-          setData(res.data);
+          setData(res.data.user);
         });
     } catch (error) {
       console.error("Error fetching data:", error);

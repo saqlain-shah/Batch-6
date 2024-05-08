@@ -1,4 +1,5 @@
 import express from "express";
+// import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
@@ -10,24 +11,25 @@ import hotelsRoutes from "./Routes/hotel.routes.js";
 import roomRoutes from "./Routes/room.routes.js";
 
 const app = express();
-
+// const bodyParse=bodyParser();
 dotenv.config();
 
 // Middlewares
 const corsOptions = {
   credentials: true,
-  origin: 'http://localhost:5173'
+  origin: "http://localhost:5173",
 };
 app.use(cors(corsOptions));
 
 app.use(cookieParser());
 app.use(express.json());
+// app.use(bodyParse);
 
 // Set endpoints
 // Auth
-app.post("/api/auth", authRoute); 
-app.post("/api/auth/register", register); 
-app.post("/api/auth/login", login); 
+app.post("/api/auth", authRoute);
+app.post("/api/auth/register", register);
+app.post("/api/auth/login", login);
 
 // Users
 app.use("/api/users", usersRoutes);

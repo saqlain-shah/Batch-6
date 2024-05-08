@@ -53,7 +53,7 @@ const User = () => {
     try {
       const response = await axios.get("http://localhost:8000/api/users/");
       console.log("response: ", response.data);
-      setUserList(response.data);
+      setUserList(response.data.users);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -143,7 +143,8 @@ const User = () => {
             size: 300,
           },
           {
-            accessorFn: (row) => (row.isAdmin ? "Yes" : "No"),
+            accessorKey:"isAdmin",
+            // accessorFn: (row) => (row.isAdmin ? "Yes" : "No"),
             header: "IsAdmin",
             size: 50,
             Cell: ({ cell }) => (
@@ -159,7 +160,7 @@ const User = () => {
                   fontWeight: "bold",
                 })}
               >
-                {/* {cell.getValue() ? "Yes" : "No"} */}
+                {cell.getValue() ? "Yes" : "No"}
               </Box>
             ),
           },
