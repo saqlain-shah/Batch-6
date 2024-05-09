@@ -151,7 +151,7 @@ const Hotel = () => {
                   alt="avatar"
                   height={50}
                   src={window.URL.createObjectURL(row.original.photos)}
-                  // loading="lazy"
+                  loading="lazy"
                   style={{ border: "2px solid teal", borderRadius: "5px" }}
                 />
                 <span>{renderedCellValue}</span>

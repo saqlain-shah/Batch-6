@@ -1,5 +1,4 @@
 import express from "express";
-// import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import cors from "cors";
@@ -9,10 +8,19 @@ import authRoute from "./Routes/auth.routes.js";
 import usersRoutes from "./Routes/user.routes.js";
 import hotelsRoutes from "./Routes/hotel.routes.js";
 import roomRoutes from "./Routes/room.routes.js";
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+// const __filename = fileURLToPath(import.meta.url);
+// const __dirname = dirname(__filename);
 
 const app = express();
-// const bodyParse=bodyParser();
 dotenv.config();
+
+// Serve static files (images)
+// app.use(express.static(join(__dirname, 'uploads')));
+app.use(express.static('uploads'));
+
 
 // Middlewares
 const corsOptions = {
@@ -20,10 +28,8 @@ const corsOptions = {
   origin: "http://localhost:5173",
 };
 app.use(cors(corsOptions));
-
 app.use(cookieParser());
 app.use(express.json());
-// app.use(bodyParse);
 
 // Set endpoints
 // Auth
