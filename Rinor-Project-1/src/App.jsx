@@ -206,7 +206,7 @@ function App() {
             <Route path='/hotel/:id' element={<SingleHotel />} />
             <Route path="/bookings" element={<Bookings />} />
             <Route path="/rooms" element={<Rooms />} />
-            <Route path="/dummy" element={<Dummy />} />
+            {/* <Route path="/dummy" element={<Dummy />} /> */}
           </Routes>
         </Main>
       </Box>

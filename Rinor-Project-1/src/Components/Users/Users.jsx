@@ -40,7 +40,12 @@ const User = () => {
 
   const handleChange = (event) => {
     const { name, value, type } = event.target;
-    const newValue = type === "checkbox" ? event.target.checked : value;
+    const newValue =
+      type === "checkbox"
+        ? event.target.checked
+        : type === "file"
+        ? event.target.files[0]
+        : value;
     setUserData({ ...userData, [name]: newValue });
   };
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -59,22 +64,23 @@ const User = () => {
     }
   };
 
-  const handleModalClose = async () => {
+  const handleUpdateUser = async () => {
     if (id === "") {
-      //  const {id, ...data}=userData
-      await axios.post("http://localhost:8000/api/users/", userData);
+      const formData = new FormData();
+      Object.entries(userData).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+      await axios.post("http://localhost:8000/api/users/", formData);
     } else {
-      // console.log("id", id);
       await handleUpdate(id);
     }
-
+    // console.log("userData:", userData);
     setIsModalOpen(false);
   };
 
   const handleUpdate = async (id) => {
     try {
       console.log("id", id);
-
       await axios
         .put(`http://localhost:8000/api/users/${id}`, userData)
         .then(() => {
@@ -126,7 +132,7 @@ const User = () => {
                 <img
                   alt="avatar"
                   height={50}
-                  src={row.original.photos[0]}
+                  src={row.original.photos}
                   loading="lazy"
                   style={{ border: "2px solid teal", borderRadius: "50%" }}
                 />
@@ -143,7 +149,7 @@ const User = () => {
             size: 300,
           },
           {
-            accessorKey:"isAdmin",
+            accessorKey: "isAdmin",
             // accessorFn: (row) => (row.isAdmin ? "Yes" : "No"),
             header: "IsAdmin",
             size: 50,
@@ -216,7 +222,7 @@ const User = () => {
         <img
           alt="avatar"
           height={150}
-          src={row.original.photos[0]}
+          src={row.original.photos}
           loading="lazy"
           style={{ border: "5px solid teal", borderRadius: "50%" }}
         />
@@ -275,7 +281,7 @@ const User = () => {
   return (
     <>
       <MaterialReactTable table={table} />;{/* User Form */}
-      <Modal open={isModalOpen} onClose={handleModalClose}>
+      <Modal open={isModalOpen} onClose={handleUpdateUser}>
         <Box
           sx={{
             position: "absolute",
@@ -321,6 +327,14 @@ const User = () => {
               value={userData.email}
               onChange={handleChange}
             />
+
+            <input
+              style={{ display: "block" }}
+              type="file"
+              name="photos"
+              onChange={handleChange}
+            />
+
             <FormControlLabel
               control={
                 <Checkbox
@@ -367,7 +381,7 @@ const User = () => {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={handleModalClose}
+                onClick={handleUpdateUser}
               >
                 Update User
               </Button>

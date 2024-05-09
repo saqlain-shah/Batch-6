@@ -77,7 +77,7 @@ const Hotel = () => {
     }
   };
 
-  const handleModalClose = async () => {
+  const handleCreateHotel = async () => {
     if (id === "") {
       const formData = new FormData();
       Object.entries(hotelData).forEach(([key, value]) => {
@@ -90,7 +90,7 @@ const Hotel = () => {
       setIsModalOpen(false);
     } else {
       // console.log("id", id);
-      handleUpdate(id);
+      await handleUpdate(id);
     }
   };
   const handleUpdate = async (id) => {
@@ -150,7 +150,7 @@ const Hotel = () => {
                 <img
                   alt="avatar"
                   height={50}
-                  src={window.URL.createObjectURL(row.original.photos)}
+                  // src={window.URL.createObjectURL(row.original.photos)}
                   loading="lazy"
                   style={{ border: "2px solid teal", borderRadius: "5px" }}
                 />
@@ -314,7 +314,7 @@ const Hotel = () => {
       <MaterialReactTable table={table} />
 
       {/* New Hotels Form */}
-      <Modal open={isModalOpen} onClose={handleModalClose}>
+      <Modal open={isModalOpen} onClose={handleCreateHotel}>
         <Box
           sx={{
             position: "absolute",
@@ -446,7 +446,7 @@ const Hotel = () => {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={handleModalClose}
+                onClick={handleCreateHotel}
               >
                 {id === "" ? "Add Hotel" : "Update Hotel"}
               </Button>
