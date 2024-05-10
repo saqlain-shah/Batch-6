@@ -1,7 +1,7 @@
 import {
   MaterialReactTable,
   useMaterialReactTable,
-} from 'material-react-table';
+} from "material-react-table";
 import {
   Box,
   ListItemIcon,
@@ -9,18 +9,18 @@ import {
   Button,
   Modal,
   TextField,
-} from '@mui/material';
+} from "@mui/material";
 // import { Edit, Delete } from '@mui/icons-material';
 // import { data } from './bookingData';
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 const Bookings = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [roomId, setRoomId] = useState('');
-  const [hotelId, setHotelId] = useState('');
-  const [arrive, setArrive] = useState('');
-  const [depart, setDepart] = useState('');
+  const [roomId, setRoomId] = useState("");
+  const [hotelId, setHotelId] = useState("");
+  const [arrive, setArrive] = useState("");
+  const [depart, setDepart] = useState("");
   const [bookingList, setBookingList] = useState([]);
 
   const openModal = () => {
@@ -37,7 +37,7 @@ const Bookings = () => {
         roomId,
         hotelId,
         arrive,
-        depart
+        depart,
       });
       // Assuming successful addition, fetch updated data
       fetchBookingData();
@@ -49,7 +49,9 @@ const Bookings = () => {
 
   const fetchBookingData = async () => {
     try {
-      const response = await axios.get("http://localhost:8000/api/booking/list");
+      const response = await axios.get(
+        "http://localhost:8000/api/booking/list"
+      );
       setBookingList(response.data);
     } catch (error) {
       console.error("Error fetching booking data:", error);
@@ -62,33 +64,33 @@ const Bookings = () => {
 
   const columns = [
     {
-      id: 'users',
-      header: 'All Bookings',
+      id: "users",
+      header: "All Bookings",
       columns: [
         {
           accessorFn: (row) => `${row.hotelId} ${row.hotelId}`,
-          id: 'hotelId',
-          header: 'Hotel ID',
+          id: "hotelId",
+          header: "Hotel ID",
           size: 200,
         },
         {
-          accessorKey: 'roomId',
-          header: 'Room ID',
+          accessorKey: "roomId",
+          header: "Room ID",
           size: 150,
         },
         {
-          accessorKey: 'mobile',
-          header: 'Mobile',
+          accessorKey: "mobile",
+          header: "Mobile",
           size: 150,
         },
         {
-          accessorKey: 'arrive',
-          header: 'Arrive',
+          accessorKey: "arrive",
+          header: "Arrive",
           size: 150,
         },
         {
-          accessorKey: 'depart',
-          header: 'Depart',
+          accessorKey: "depart",
+          header: "Depart",
           size: 150,
         },
       ],
@@ -109,32 +111,32 @@ const Bookings = () => {
       showColumnFilters: false,
       showGlobalFilter: true,
       columnPinning: {
-        left: ['mrt-row-expand', 'mrt-row-select'],
-        right: ['mrt-row-actions'],
+        left: ["mrt-row-expand", "mrt-row-select"],
+        right: ["mrt-row-actions"],
       },
     },
-    paginationDisplayMode: 'pages',
-    positionToolbarAlertBanner: 'bottom',
+    paginationDisplayMode: "pages",
+    positionToolbarAlertBanner: "bottom",
     muiSearchTextFieldProps: {
-      size: 'small',
-      variant: 'outlined',
+      size: "small",
+      variant: "outlined",
     },
     muiPaginationProps: {
-      color: 'secondary',
+      color: "secondary",
       rowsPerPageOptions: [5, 10, 15, 20, 25, 30],
-      shape: 'rounded',
-      variant: 'outlined',
+      shape: "rounded",
+      variant: "outlined",
     },
     renderDetailPanel: ({ row }) => (
       <Box
         sx={{
-        alignItems: 'left',
-        // display: 'flex',
-        justifyContent: 'space-around',
-        left: '30px',
-        maxWidth: '1000px',
-        position: 'sticky',
-        width: '100%',
+          alignItems: "left",
+          // display: 'flex',
+          justifyContent: "space-around",
+          left: "30px",
+          maxWidth: "1000px",
+          position: "sticky",
+          width: "100%",
         }}
       >
         <img
@@ -142,7 +144,7 @@ const Bookings = () => {
           height={150}
           src={row.original.avatar}
           loading="lazy"
-          style={{ borderRadius: '50%' }}
+          style={{ borderRadius: "50%" }}
         />
       </Box>
     ),
@@ -164,7 +166,7 @@ const Bookings = () => {
         key="delete"
         onClick={() => {
           const selectedRows = table.getSelectedRowModel().flatRows;
-          selectedRows.forEach(row => table.deleteRow(row.id));
+          selectedRows.forEach((row) => table.deleteRow(row.id));
           closeMenu();
         }}
         sx={{ m: 0 }}
@@ -180,7 +182,9 @@ const Bookings = () => {
   return (
     <>
       <Box mb={2} textAlign="right">
-        <Button variant="contained" color="primary" onClick={openModal}>ADD NEW+</Button>
+        <Button variant="contained" color="primary" onClick={openModal}>
+          ADD NEW+
+        </Button>
       </Box>
       <MaterialReactTable table={table} />
 
@@ -191,15 +195,15 @@ const Bookings = () => {
       >
         <Box
           sx={{
-            position: 'absolute',
+            position: "absolute",
             width: 400,
-            bgcolor: 'background.paper',
-            border: '2px solid #000',
+            bgcolor: "background.paper",
+            border: "2px solid #000",
             boxShadow: 24,
             p: 4,
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
           }}
         >
           <h2 id="add-new-booking-modal">Add New Booking</h2>
@@ -247,8 +251,17 @@ const Bookings = () => {
             }}
             sx={{ mb: 2 }}
           />
-          <Button variant="contained" color="primary" onClick={handleAddNew}>Add</Button>
-          <Button variant="contained" color="primary"style={{ position: 'absolute', top: "85.7%", right: 10}} onClick={closeModal}>close</Button>
+          <Button variant="contained" color="primary" onClick={handleAddNew}>
+            Add
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            style={{ position: "absolute", top: "85.7%", right: 10 }}
+            onClick={closeModal}
+          >
+            close
+          </Button>
         </Box>
       </Modal>
     </>
@@ -256,7 +269,3 @@ const Bookings = () => {
 };
 
 export default Bookings;
-
-
-
-

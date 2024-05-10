@@ -57,27 +57,34 @@ const User = () => {
       console.error("Error fetching data:", error);
     }
   };
-
-  const handleModalClose = async () => {
-    if (id === "") {
-      await axios.post("http://localhost:8000/api/users/", userData);
-    } else {
-      await handleUpdate(id); // Call handleUpdate directly
+  const handleUpdateUser = async () => {
+    // Update parameter name to avoid confusion
+    try {
+      if (id === "") {
+        const formData = new FormData();
+        Object.entries(userData).forEach(([key, value]) => {
+          formData.append(key, value);
+        });
+        await axios.post("http://localhost:8000/api/user/", formData);
+        resetForm();
+        setIsModalOpen(false);
+      } else {
+        // Call the correct function handleUpdate instead of handleUpdateUser
+        await handleUpdate(id);
+      }
+    } catch (error) {
+      console.error("Error updating user:", error);
     }
-    resetForm();
-    setId(""); // Reset id after handling the update or insert
-    setIsModalOpen(false);
   };
-
   const handleUpdate = async (id) => {
     try {
       console.log("id", id);
 
-      await axios.put(`http://localhost:8000/api/users/${id}`, userData);
-      // Reset form and close modal after successful update
-      resetForm();
-      setId("");
-      setIsModalOpen(false);
+      await axios.put(`http://localhost:8000/api/users/${id}`,userData).then(() => {
+        resetForm();
+        setId("");
+        setIsModalOpen(false);
+      });
     } catch (error) {
       console.error("Error updating data:", error);
     }
@@ -120,13 +127,18 @@ const User = () => {
                   gap: "1rem",
                 }}
               >
-                <img
-                  alt="avatar"
-                  height={50}
-                  src={row.original.photos[0]}
-                  loading="lazy"
-                  style={{ border: "2px solid teal", borderRadius: "5px" }}
-                />
+                {row.original.photos && ( // Check if photos data exists
+                  <img
+                    alt="avatar"
+                    height={50}
+                    src={row.original.photos} // Assuming photos is a URL
+                    loading="lazy"
+                    style={{
+                      border: "2px solid teal",
+                      borderRadius: "5px",
+                    }}
+                  />
+                )}
                 <span>{renderedCellValue}</span>
               </Box>
             ),
@@ -203,7 +215,7 @@ const User = () => {
       >
         <img
           alt="avatar"
-          src={row.original.photos[0]}
+          src={row.original.photos}
           loading="lazy"
           style={{
             maxWidth: "100%",
@@ -279,7 +291,7 @@ const User = () => {
       <MaterialReactTable table={table} />
 
       {/* New Hotels Form */}
-      <Modal open={isModalOpen} onClose={handleModalClose}>
+      <Modal open={isModalOpen} onClose={handleUpdateUser}>
         <Box
           sx={{
             position: "absolute",
@@ -343,16 +355,23 @@ const User = () => {
               }
               label="Yes"
             />
-             <FormControlLabel
+            <FormControlLabel
               control={
                 <Checkbox
                   checked={!userData.isAdmin}
-                  onChange={(e)=>handleChange({...e,target:{name:"isAdmin", value:!userData.isAdmin}})}
+                  onChange={(e) =>
+                    handleChange({
+                      ...e,
+                      target: { name: "isAdmin", value: !userData.isAdmin },
+                    })
+                  }
                   name="isAdmin"
                 />
               }
               label="No"
             />
+            <input type="file" name="photos" onChange={handleChange} />
+
             {/* Other TextField components */}
             <Box
               sx={{
@@ -375,7 +394,7 @@ const User = () => {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={handleModalClose}
+                onClick={handleUpdateUser}
               >
                 {id === "" ? "Add Hotel" : "Update User"}
               </Button>
