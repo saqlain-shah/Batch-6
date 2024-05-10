@@ -34,7 +34,6 @@ export const createHotel = async (req, res, next) => {
     next(err);
   }
 };
-
 export const updateHotel = async (req, res, next) => {
   console.log("Request Body ", req.body);
   console.log("Request file ", req.file);
