@@ -3,24 +3,21 @@ const UserSchema = new mongoose.Schema(
   {
     firstName: {
       type: String,
-      // required: true,
-      // // unique: true,
+      required: true,
+      unique: true,
     },
     lastName: {
       type: String,
-      // required: true,
-      // // unique: true,
+      required: true,
+      unique: true,
     },
-    username: {
+    photo: {
       type: String,
-      // required: true,
-      // // unique: true,
     },
     email: {
       type: String,
-      // required: true,
-      // unique: true,
-      
+      required: true,
+      unique: true,
     },
     // password: {
     //   type: String,
@@ -29,9 +26,6 @@ const UserSchema = new mongoose.Schema(
     isAdmin: {
       type: Boolean,
       default: true,
-    },
-    photos: {
-      type: String,
     },
   },
   { timestamps: true }

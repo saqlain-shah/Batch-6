@@ -1,10 +1,8 @@
 import User from "../Model/User.js";
-import upload from "../utils/multer.js";
-
+import upload from "../Utils/multer.js";
 export const updateUser = async (req, res, next) => {
-  console.log("body", { ...req.body });
   try {
-    // Use upload middleware to handle file uploads
+    // First, handle the file upload
     upload.single("photos")(req, res, async function (err) {
       if (err) {
         console.error("Error uploading images:", err);
@@ -12,60 +10,102 @@ export const updateUser = async (req, res, next) => {
       }
 
       try {
-        // Check if req.file is defined before accessing its properties
-        const photos = req.file ? req.file.path : null;
-        if (!photos) {
-          console.error("No file uploaded");
-          return res.status(400).json({ error: "No file uploaded" });
+        const photos = req.file;
+        console.log("Uploaded photos:", photos.path);
+        console.log("Request Body:", req.body);
+
+        // Now that we have uploaded photos, let's update the user
+        const updateUser = await User.findByIdAndUpdate(
+          req.params.id,
+          { $set: { ...req.body, photo: photos.path } },
+          { new: true }
+        );
+
+        // If updateUser is null, it means user not found
+        if (!updateUser) {
+          return res.status(404).send({
+            success: false,
+            message: "User not found.",
+          });
         }
 
-        console.log("Uploaded photos:", photos);
-        console.log("Request Body : ", req.body);
+        // If updateUser is found, send back the updated user
+        const { password, ...userData } = updateUser._doc;
 
-        const newUser = new User({
-          ...req.body,
-          photos: photos,
+        res.status(200).send({
+          success: true,
+          message: "User has been updated successfully.",
+          user: userData,
         });
-
-        const savedUser = await newUser.save();
-        res.status(200).json(savedUser);
-      } catch (error) {
-        console.error("Error creating user:", error);
-        res.status(500).json({ error: "Error creating user" });
+      } catch (err) {
+        console.error("Error updating user:", err);
+        return res.status(500).json({ error: "Error updating user" });
       }
     });
   } catch (err) {
-    console.error("Error in updateUser:", err);
-    next(err);
+    console.error("Error in file upload:", err);
+    return res.status(500).json({ error: "Error in file upload" });
   }
 };
+
 export const deleteUser = async (req, res, next) => {
   try {
     const deletedUser = await User.findByIdAndDelete(req.params.id);
+
     if (!deletedUser) {
-      return res.status(404).json({ message: "User not found." });
+      return res.status(404).send({
+        success: false,
+        message: "User not found.",
+      });
     }
-    const { password, ...deletedUserDetails } = deletedUser._doc;
-    res.status(200).json({
-      message: "User has been deleted.",
-      userDetails: { ...deletedUserDetails },
+
+    res.status(200).send({
+      success: true,
+      message: "User has been deleted successfully.",
     });
   } catch (err) {
     next(err);
   }
 };
+
 export const getUser = async (req, res, next) => {
   try {
     const user = await User.findById(req.params.id);
-    res.status(200).json(user);
+
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found.",
+      });
+    }
+
+    const { password, ...userData } = user._doc;
+
+    res.status(200).send({
+      success: true,
+      message: "User has been displayed successfully.",
+      user: userData,
+    });
   } catch (err) {
     next(err);
   }
 };
+
 export const getUsers = async (req, res, next) => {
   try {
     const users = await User.find();
-    res.status(200).json(users);
+    console.log("get users api triggered");
+
+    // Exclude password field from all user data
+    const allUsers = users.map((user) => {
+      const { password, ...userData } = user._doc;
+      return userData;
+    });
+    res.status(200).json({
+      success: true,
+      message: "All the users have been displayed successfully.",
+      users: allUsers,
+    });
   } catch (err) {
     next(err);
   }
