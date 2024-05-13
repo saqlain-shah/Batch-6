@@ -65,7 +65,7 @@ const User = () => {
         Object.entries(userData).forEach(([key, value]) => {
           formData.append(key, value);
         });
-        await axios.post("http://localhost:8000/api/user/", formData);
+        await axios.put("http://localhost:8000/api/user/", formData);
         resetForm();
         setIsModalOpen(false);
       } else {
