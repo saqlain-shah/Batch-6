@@ -57,9 +57,9 @@ const User = () => {
   const fetchUsersData = async () => {
     try {
       const response = await axios.get("http://localhost:8000/api/users/");
-      console.log("response: ", response.data);
+      console.log("data:", response.data);
       response.data.users.map(
-        (data) => (data.photos = `http://localhost:8000/${data.photos}`)
+        (user) => (user.photo = `http://localhost:8000/${user.photo}`)
       );
       setUserList(response.data.users);
     } catch (error) {
@@ -68,16 +68,14 @@ const User = () => {
   };
 
   const handleUpdateUser = async () => {
-    if (id === "") {
+    if (id) {
       const formData = new FormData();
       Object.entries(userData).forEach(([key, value]) => {
         formData.append(key, value);
       });
-      await axios.put(`http://localhost:8000/api/users/`, formData);
-    } else {
-      await handleUpdate(id);
+      await axios.put(`http://localhost:8000/api/users/${id}`, formData);
     }
-    // console.log("userData:", userData);
+
     setIsModalOpen(false);
   };
 
@@ -135,7 +133,7 @@ const User = () => {
                 <img
                   alt="avatar"
                   height={50}
-                  src={row.original.photos}
+                  src={row.original.photo}
                   loading="lazy"
                   style={{ border: "2px solid teal", borderRadius: "50%" }}
                 />
