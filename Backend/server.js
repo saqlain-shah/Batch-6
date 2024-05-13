@@ -9,7 +9,8 @@ import usersRoutes from "./Routes/user.routes.js";
 import hotelsRoutes from "./Routes/hotel.routes.js";
 import roomRoutes from "./Routes/room.routes.js";
 import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import { dirname } from 'path';
+import path from 'path';
 
 // const __filename = fileURLToPath(import.meta.url);
 // const __dirname = dirname(__filename);
@@ -21,6 +22,8 @@ dotenv.config();
 // app.use(express.static(join(__dirname, 'uploads')));
 app.use(express.static('uploads'));
 
+const __dirname = dirname(fileURLToPath(import.meta.url));
+app.use('/Uploads', express.static(path.join(__dirname, 'Uploads')));
 
 // Middlewares
 const corsOptions = {

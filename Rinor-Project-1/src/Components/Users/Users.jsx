@@ -58,6 +58,9 @@ const User = () => {
     try {
       const response = await axios.get("http://localhost:8000/api/users/");
       console.log("response: ", response.data);
+      response.data.users.map(
+        (data) => (data.photos = `http://localhost:8000/${data.photos}`)
+      );
       setUserList(response.data.users);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -70,7 +73,7 @@ const User = () => {
       Object.entries(userData).forEach(([key, value]) => {
         formData.append(key, value);
       });
-      await axios.post("http://localhost:8000/api/users/", formData);
+      await axios.put(`http://localhost:8000/api/users/`, formData);
     } else {
       await handleUpdate(id);
     }
