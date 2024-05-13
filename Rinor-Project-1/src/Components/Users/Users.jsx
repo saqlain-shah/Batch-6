@@ -1,21 +1,118 @@
 /* eslint-disable react/prop-types */
-import { useMemo } from "react";
+import { useState, useEffect, useMemo } from "react";
+import axios from "axios";
 // MRT Imports
 import {
   MaterialReactTable,
   useMaterialReactTable,
 } from "material-react-table";
 
-// Material UI Imports
-import { Box, ListItemIcon, MenuItem, } from "@mui/material";
+import {
+  Box,
+  ListItemIcon,
+  MenuItem,
+  Button,
+  Modal,
+  TextField,
+  Typography,
+  FormControlLabel,
+  Checkbox,
+} from "@mui/material";
 
 // Icons Imports
-import { Edit, Delete } from "@mui/icons-material";
+import { Edit, Delete, Visibility } from "@mui/icons-material";
+import { useNavigate } from "react-router-dom";
 
 // Users Data
-import { data } from "./usersData";
+// import { data } from "./usersData";
 
-const Example = () => {
+const User = () => {
+  const Navigate = useNavigate();
+  const [userList, setUserList] = useState([]);
+  const [id, setId] = useState("");
+  const [userData, setUserData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    isAdmin: true,
+  });
+
+  const handleChange = (event) => {
+    const { name, value, type } = event.target;
+    const newValue =
+      type === "checkbox"
+        ? event.target.checked
+        : type === "file"
+        ? event.target.files[0]
+        : value;
+    setUserData({ ...userData, [name]: newValue });
+  };
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // const handleModalOpen = () => {
+  //   setIsModalOpen(true);
+  // };
+
+  const fetchUsersData = async () => {
+    try {
+      const response = await axios.get("http://localhost:8000/api/users/");
+      console.log("response: ", response.data);
+      response.data.users.map(
+        (data) => (data.photos = `http://localhost:8000/${data.photos}`)
+      );
+      setUserList(response.data.users);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  const handleUpdateUser = async () => {
+    if (id === "") {
+      const formData = new FormData();
+      Object.entries(userData).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+      await axios.put(`http://localhost:8000/api/users/`, formData);
+    } else {
+      await handleUpdate(id);
+    }
+    // console.log("userData:", userData);
+    setIsModalOpen(false);
+  };
+
+  const handleUpdate = async (id) => {
+    try {
+      console.log("id", id);
+      await axios
+        .put(`http://localhost:8000/api/users/${id}`, userData)
+        .then(() => {
+          setId("");
+          setIsModalOpen(false);
+        });
+    } catch (error) {
+      console.error("Error updating data:", error);
+    }
+  };
+
+  let handleDelete = async (id) => {
+    // console.log("id", id);
+    try {
+      const confirmDelete = window.confirm(
+        "Are you sure you want to delete the data?"
+      );
+      if (confirmDelete) {
+        await axios.delete(`http://localhost:8000/api/users/${id}`);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  useEffect(() => {
+    fetchUsersData();
+  }, []);
+
   const columns = useMemo(
     () => [
       {
@@ -38,7 +135,7 @@ const Example = () => {
                 <img
                   alt="avatar"
                   height={50}
-                  src={row.original.avatar}
+                  src={row.original.photos}
                   loading="lazy"
                   style={{ border: "2px solid teal", borderRadius: "50%" }}
                 />
@@ -48,11 +145,6 @@ const Example = () => {
             ),
           },
           {
-            accessorKey: "username", 
-            header: "Username",
-            size: 200, 
-          },
-          {
             accessorKey: "email",
             enableClickToCopy: true,
             filterVariant: "autocomplete",
@@ -60,9 +152,10 @@ const Example = () => {
             size: 300,
           },
           {
-            accessorKey: "isAdmin", // Added column for isAdmin
-            header: "Is Admin",
-            size: 50, // Adjust size as needed
+            accessorKey: "isAdmin",
+            // accessorFn: (row) => (row.isAdmin ? "Yes" : "No"),
+            header: "IsAdmin",
+            size: 50,
             Cell: ({ cell }) => (
               <Box
                 component="span"
@@ -88,7 +181,7 @@ const Example = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data, //data must be memoized or stable (useState, useMemo, defined outside of this component, etc.)
+    data: userList,
     enableColumnFilterModes: true,
     enableColumnOrdering: true,
     enableGrouping: true,
@@ -96,6 +189,7 @@ const Example = () => {
     enableFacetedValues: true,
     enableRowActions: true,
     enableRowSelection: true,
+    getRowId: (row) => row.id,
     initialState: {
       showColumnFilters: false,
       showGlobalFilter: true,
@@ -131,18 +225,37 @@ const Example = () => {
         <img
           alt="avatar"
           height={150}
-          src={row.original.avatar}
+          src={row.original.photos}
           loading="lazy"
-          style={{border: "5px solid teal", borderRadius: "50%" }}
+          style={{ border: "5px solid teal", borderRadius: "50%" }}
         />
       </Box>
     ),
-    renderRowActionMenuItems: ({ closeMenu, table }) => [
+    renderRowActionMenuItems: (params) => [
+      <MenuItem
+        key="view"
+        onClick={() => {
+          Navigate(`/user/${params.row.original._id}`);
+          params.closeMenu();
+        }}
+        sx={{ m: 0 }}
+      >
+        <ListItemIcon>
+          <Visibility />
+        </ListItemIcon>
+        View
+      </MenuItem>,
+
       <MenuItem
         key="edit"
         onClick={() => {
-          // Edit logic...
-          closeMenu();
+          setUserData(
+            userList.find((item) => item._id === params.row.original._id)
+          );
+          setId(params.row.original._id);
+          setIsModalOpen(true);
+
+          params.closeMenu();
         }}
         sx={{ m: 0 }}
       >
@@ -151,12 +264,12 @@ const Example = () => {
         </ListItemIcon>
         Edit
       </MenuItem>,
+
       <MenuItem
         key="delete"
         onClick={() => {
-          const selectedRows = table.getSelectedRowModel().flatRows;
-          selectedRows.forEach((row) => table.deleteRow(row.id));
-          closeMenu();
+          handleDelete(params.row.original._id);
+          params.closeMenu();
         }}
         sx={{ m: 0 }}
       >
@@ -168,7 +281,118 @@ const Example = () => {
     ],
   });
 
-  return <MaterialReactTable table={table} />;
-};
+  return (
+    <>
+      <MaterialReactTable table={table} />;{/* User Form */}
+      <Modal open={isModalOpen} onClose={handleUpdateUser}>
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            width: 400,
+            maxWidth: "90%",
+            maxHeight: "90%",
+            overflowY: "auto",
+          }}
+        >
+          <form>
+            <Typography variant="h5">Update User</Typography>
+            <TextField
+              variant="standard"
+              label="First Name"
+              fullWidth
+              margin="normal"
+              name="firstName"
+              value={userData.firstName}
+              onChange={handleChange}
+            />
+            <TextField
+              variant="standard"
+              label="Last Name"
+              fullWidth
+              margin="normal"
+              name="lastName"
+              value={userData.lastName}
+              onChange={handleChange}
+            />
 
-export default Example;
+            <TextField
+              variant="standard"
+              label="Email"
+              fullWidth
+              margin="normal"
+              name="email"
+              value={userData.email}
+              onChange={handleChange}
+            />
+
+            <input
+              style={{ display: "block" }}
+              type="file"
+              name="photos"
+              onChange={handleChange}
+            />
+
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={userData.isAdmin}
+                  onChange={handleChange}
+                  name="isAdmin"
+                />
+              }
+              label="Yes"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={!userData.isAdmin}
+                  onChange={(e) =>
+                    handleChange({
+                      ...e,
+                      target: { name: "isAdmin", value: !userData.isAdmin },
+                    })
+                  }
+                  name="isAdmin"
+                />
+              }
+              label="No"
+            />
+
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "1rem",
+              }}
+            >
+              <Button
+                variant="outlined"
+                color="primary"
+                onClick={() => {
+                  setIsModalOpen(false);
+                }}
+              >
+                Close
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleUpdateUser}
+              >
+                Update User
+              </Button>
+            </Box>
+          </form>
+        </Box>
+      </Modal>
+    </>
+  );
+};
+export default User;

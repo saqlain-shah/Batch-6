@@ -2,6 +2,7 @@ import User from "../Models/user.model.js";
 
 export const updateUser = async (req, res, next) => {
   try {
+    
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
       { $set: req.body },
@@ -73,14 +74,14 @@ export const getUser = async (req, res, next) => {
 export const getUsers = async (req, res, next) => {
   try {
     const users = await User.find();
+    console.log("get users api triggered")
 
     // Exclude password field from all user data
     const allUsers = users.map((user) => {
       const { password, ...userData } = user._doc;
       return userData;
     });
-
-    res.status(200).send({
+    res.status(200).json({
       success: true,
       message: "All the users have been displayed successfully.",
       users: allUsers,

@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Card, CardContent, Typography } from "@mui/material";
-import { useParams } from "react-router-dom";
+import { Box, Button, Card, CardContent, Typography } from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 const SingleHotel = () => {
+  const Navigate = useNavigate();
   const [data, setData] = useState({
     name: "",
     type: "",
@@ -31,37 +32,53 @@ const SingleHotel = () => {
     fetchHotelData(params);
   });
   return (
-    <Card>
-      <CardContent>
-        <Typography variant="h5" component="h2">
-          {data.name}
-        </Typography>
-        <Typography color="textSecondary" gutterBottom>
-          {data.city}
-        </Typography>
-        <Typography variant="body2" component="p">
-          Type: {data.type}
-        </Typography>
-        <Typography variant="body2" component="p">
-          Address: {data.address}
-        </Typography>
-        <Typography variant="body2" component="p">
-          Rating: {data.rating}
-        </Typography>
-        <Typography variant="body2" component="p">
-          Cheapest Price: {data.cheapestPrice}
-        </Typography>
-        <Typography variant="body2" component="p">
-          Featured: {data.featured ? "Yes" : "No"}
-        </Typography>
-        <Typography variant="body2" component="p">
-          Title: {data.title}
-        </Typography>
-        <Typography variant="body2" component="p">
-          Description: {data.desc}
-        </Typography>
-      </CardContent>
-    </Card>
+    <>
+      <Box>
+      <Card>
+        <CardContent>
+          <Typography variant="h5" component="h2">
+            {data.name}
+          </Typography>
+          <Typography color="textSecondary" gutterBottom>
+            {data.city}
+          </Typography>
+          <Typography variant="body2" component="p">
+            Type: {data.type}
+          </Typography>
+          <Typography variant="body2" component="p">
+            Address: {data.address}
+          </Typography>
+          <Typography variant="body2" component="p">
+            Rating: {data.rating}
+          </Typography>
+          <Typography variant="body2" component="p">
+            Cheapest Price: {data.cheapestPrice}
+          </Typography>
+          <Typography variant="body2" component="p">
+            Featured: {data.featured ? "Yes" : "No"}
+          </Typography>
+          <Typography variant="body2" component="p">
+            Title: {data.title}
+          </Typography>
+          <Typography variant="body2" component="p">
+            Description: {data.desc}
+          </Typography>
+
+          <Box textAlign="right">
+            <Button
+              variant="outlined"
+              color="primary"
+              onClick={() => {
+                Navigate(`/hotels`);
+              }}
+            >
+              Back
+            </Button>
+          </Box>
+        </CardContent>
+      </Card>
+      </Box>
+    </>
   );
 };
 

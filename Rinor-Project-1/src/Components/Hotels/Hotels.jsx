@@ -18,7 +18,7 @@ import { Edit, Delete, Visibility } from "@mui/icons-material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const Example = () => {
+const Hotel = () => {
   const Navigate = useNavigate();
   const [hotelList, setHotelList] = useState([]);
   const [id, setId] = useState("");
@@ -51,7 +51,12 @@ const Example = () => {
   };
   const handleChange = (event) => {
     const { name, value, type } = event.target;
-    const newValue = type === "checkbox" ? event.target.checked : value;
+    const newValue =
+      type === "checkbox"
+        ? event.target.checked
+        : type === "file"
+        ? event.target.files[0] // Get the file object from the event
+        : value;
     setHotelData({ ...hotelData, [name]: newValue });
   };
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -64,22 +69,30 @@ const Example = () => {
       const response = await axios.get(
         "http://localhost:8000/api/hotels/hotels"
       );
+      console.log("data", response.data);
+      response.data.map(
+        (data) => (data.photos = `http://localhost:8000/${data.photos}`)
+      );
       setHotelList(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
-  const handleModalClose = async () => {
+  const handleCreateHotel = async () => {
     if (id === "") {
+      const formData = new FormData();
+      Object.entries(hotelData).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
       //  const {id, ...data}=hotelData
-      await axios.post("http://localhost:8000/api/hotels/", hotelData);
+      await axios.post("http://localhost:8000/api/hotels/", formData);
 
       resetForm();
       setIsModalOpen(false);
     } else {
       // console.log("id", id);
-      handleUpdate(id);
+      await handleUpdate(id);
     }
   };
   const handleUpdate = async (id) => {
@@ -114,7 +127,7 @@ const Example = () => {
 
   useEffect(() => {
     fetchHotelData();
-  }, [hotelList]);
+  }, []);
 
   const columns = useMemo(
     () => [
@@ -135,10 +148,11 @@ const Example = () => {
                   gap: "1rem",
                 }}
               >
+                {}
                 <img
                   alt="avatar"
                   height={50}
-                  src={row.original.photos[0]}
+                  src={row.original.photos}
                   loading="lazy"
                   style={{ border: "2px solid teal", borderRadius: "5px" }}
                 />
@@ -227,7 +241,7 @@ const Example = () => {
       >
         <img
           alt="avatar"
-          src={row.original.photos[0]}
+          src={row.original.photos}
           loading="lazy"
           style={{
             maxWidth: "100%",
@@ -302,7 +316,7 @@ const Example = () => {
       <MaterialReactTable table={table} />
 
       {/* New Hotels Form */}
-      <Modal open={isModalOpen} onClose={handleModalClose}>
+      <Modal open={isModalOpen} onClose={handleCreateHotel}>
         <Box
           sx={{
             position: "absolute",
@@ -410,6 +424,8 @@ const Example = () => {
               value={hotelData.desc}
               onChange={handleChange}
             />
+            <input type="file" name="photos" onChange={handleChange} />
+
             {/* Other fields */}
             <Box
               sx={{
@@ -432,7 +448,7 @@ const Example = () => {
               <Button
                 variant="contained"
                 color="primary"
-                onClick={handleModalClose}
+                onClick={handleCreateHotel}
               >
                 {id === "" ? "Add Hotel" : "Update Hotel"}
               </Button>
@@ -444,4 +460,4 @@ const Example = () => {
   );
 };
 
-export default Example;
+export default Hotel;

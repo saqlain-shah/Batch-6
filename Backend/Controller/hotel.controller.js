@@ -2,21 +2,23 @@ import Hotel from "../Models/hotel.model.js";
 import upload from "../Utils/multer.js";
 
 export const createHotel = async (req, res, next) => {
+  console.log("body", { ...req.body });
   try {
-    upload.array("photos", 5)(req, res, async function (err) {
+    upload.single("photos")(req, res, async function (err) {
       if (err) {
         console.error("Error uploading images:", err);
         return res.status(500).json({ error: "Error uploading images" });
       }
 
       try {
-        // const photos = req.files.map((file) => file.path);
-        // console.log("Uploaded photos:", photos);
+        const photos = req.file;
+
+        console.log("Uploaded photos:", photos.path);
         console.log("Request Body : ", req.body);
 
         const newHotel = new Hotel({
           ...req.body,
-          photos: "",
+          photos: photos.path,
           // ||photos,
         });
 
@@ -72,6 +74,8 @@ export const getHotels = async (req, res, next) => {
     const hotels = await Hotel.find().populate("rooms").limit(req.query.limit);
 
     // const HOTELS = await Hotel.find();
+    console.log("Hotel List",hotels)
+
     res.status(200).json(hotels);
   } catch (err) {
     next(err);
@@ -124,6 +128,7 @@ export const countByType = async (req, res, next) => {
 };
 
 export const getHotelRooms = async (req, res, next) => {
+  
   try {
     const hotel = await Hotel.findById(req.params.id);
     const list = await Promise.all(
@@ -131,6 +136,7 @@ export const getHotelRooms = async (req, res, next) => {
         return room.findById(room);
       })
     );
+    console.log("Hotel List",list)
     res.status(200).json(list);
   } catch (err) {
     next(err);

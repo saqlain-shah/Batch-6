@@ -57,13 +57,30 @@ export const Register = () => {
       confirmPassword: "",
       age: "",
       gender: "",
+      image:undefined
     },
     validationSchema: validationSchema,
     onSubmit: async (values, { resetForm }) => {
       try {
+        console.log("values", values);
+        const formData = new FormData();
+
+        formData.append("firstName", values.firstName);
+        formData.append("lastName", values.lastName);
+        formData.append("email", values.email);
+        formData.append("password", values.password);
+        // formData.append("age", values.age);
+        // formData.append("gender", values.gender);
+        formData.append("photo", values.image);
+
         const response = await axios.post(
           "http://localhost:8000/api/auth/register",
-          values
+          formData,
+          {
+             headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          }
         );
         console.log(response.data);
 
@@ -86,7 +103,7 @@ export const Register = () => {
   // Handle the modal close event
   const handleClose = () => {
     setOpen(false);
-    Navigate('/login')
+    Navigate("/login");
   };
 
   return (
@@ -215,6 +232,34 @@ export const Register = () => {
                   {formik.errors.gender}
                 </Typography>
               ) : null}
+              <input
+                accept="image/*"
+                id="image"
+                type="file"
+                onChange={(event) => {
+                  formik.setFieldValue("image", event.currentTarget.files[0]);
+                }}
+                onBlur={formik.handleBlur}
+                multiple={false}
+                // style={{ display: "none" }} // Hide the input element
+              />
+              {/* <TextField
+                type="file"
+                label="Image"
+                name="image"
+                variant="outlined"
+                fullWidth
+                InputLabelProps={{
+                  shrink: true,
+                }}
+                size="medium"
+                value={formik.values.image}
+                onBlur={formik.handleBlur}
+                onChange={formik.handleChange}
+                margin="normal"
+                error={formik.touched.image && Boolean(formik.errors.image)}
+                helperText={formik.touched.image && formik.errors.image}
+              /> */}
             </Box>
             <Box sx={{ textAlign: "center", marginTop: 2 }}>
               <Button type="submit" variant="contained" color="primary">
