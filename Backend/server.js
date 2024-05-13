@@ -8,11 +8,17 @@ import authRoute from "./Routes/AuthRoutes.js";
 import HotelRoute from "./Routes/hotel.routes.js";
 import roomRoute from "./Routes/room.routes.js";
 import bookingRoute from "./Routes/booking.routes.js";
-
+import { fileURLToPath } from "url";
+import { dirname } from "path";
+import path from "path";
 
 const app = express();
 
 dotenv.config();
+
+app.use(express.static("upload"));
+const __dirname = dirname(fileURLToPath(import.meta.url));
+app.use("/Upload", express.static(path.join(__dirname, "Upload")));
 
 // Middlewares
 const corsOptions = {
