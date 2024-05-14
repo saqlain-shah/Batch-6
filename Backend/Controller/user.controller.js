@@ -2,25 +2,43 @@ import User from "../Models/user.model.js";
 
 export const updateUser = async (req, res, next) => {
   try {
-    const updatedUser = await User.findByIdAndUpdate(
-      req.params.id,
-      { $set: req.body },
-      { new: true }
-    );
+    // Handle file upload
+    upload.single("photos")(req, res, async function (err) {
+      if (err) {
+        console.error("Error uploading images:", err);
+        return res.status(500).json({ error: "Error uploading images" });
+      }
 
-    if (!updatedUser) {
-      return res.status(404).send({
-        success: false,
-        message: "User not found.",
-      });
-    }
+      try {
+        const photos = req.file;
+        console.log("Uploaded photos:", photos.path);
+        console.log("Request Body : ", req.body);
 
-    const { password, ...userData } = updatedUser._doc;
+        // Create or update user
+        const updatedUser = await User.findByIdAndUpdate(
+          req.params.id,
+          { $set: { ...req.body, photos: photos.path } },
+          { new: true }
+        );
 
-    res.status(200).send({
-      success: true,
-      message: "Email has been updated successfully.",
-      user: userData,
+        if (!updatedUser) {
+          return res.status(404).send({
+            success: false,
+            message: "User not found.",
+          });
+        }
+
+        const { password, ...userData } = updatedUser._doc;
+
+        res.status(200).send({
+          success: true,
+          message: "User has been updated successfully.",
+          user: userData,
+        });
+      } catch (error) {
+        console.error("Error updating user:", error);
+        res.status(500).json({ error: "Error updating user" });
+      }
     });
   } catch (err) {
     next(err);
@@ -73,7 +91,7 @@ export const getUser = async (req, res, next) => {
 export const getUsers = async (req, res, next) => {
   try {
     const users = await User.find();
-    console.log("get users api triggered")
+    console.log("get users api triggered");
 
     // Exclude password field from all user data
     const allUsers = users.map((user) => {
