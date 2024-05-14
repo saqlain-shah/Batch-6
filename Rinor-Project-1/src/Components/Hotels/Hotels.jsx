@@ -424,8 +424,13 @@ const Hotel = () => {
               value={hotelData.desc}
               onChange={handleChange}
             />
-            <input type="file" name="photos" onChange={handleChange} />
-
+            <Box
+              sx={{
+                margin: "1rem 0 1rem 0",
+              }}
+            >
+              <input type="file" name="photos" onChange={handleChange} />
+            </Box>
             {/* Other fields */}
             <Box
               sx={{
