@@ -1,8 +1,8 @@
 import User from "../Models/user.model.js";
-
+import upload from "../Utils/multer.js";
 export const updateUser = async (req, res, next) => {
   try {
-    // Handle file upload
+    // First, handle the file upload
     upload.single("photos")(req, res, async function (err) {
       if (err) {
         console.error("Error uploading images:", err);
@@ -12,36 +12,39 @@ export const updateUser = async (req, res, next) => {
       try {
         const photos = req.file;
         console.log("Uploaded photos:", photos.path);
-        console.log("Request Body : ", req.body);
+        console.log("Request Body:", req.body);
 
-        // Create or update user
-        const updatedUser = await User.findByIdAndUpdate(
+        // Now that we have uploaded photos, let's update the user
+        const updateUser = await User.findByIdAndUpdate(
           req.params.id,
           { $set: { ...req.body, photos: photos.path } },
           { new: true }
         );
 
-        if (!updatedUser) {
+        // If updateUser is null, it means user not found
+        if (!updateUser) {
           return res.status(404).send({
             success: false,
             message: "User not found.",
           });
         }
 
-        const { password, ...userData } = updatedUser._doc;
+        // If updateUser is found, send back the updated user
+        const { password, ...userData } = updateUser._doc;
 
         res.status(200).send({
           success: true,
           message: "User has been updated successfully.",
           user: userData,
         });
-      } catch (error) {
-        console.error("Error updating user:", error);
-        res.status(500).json({ error: "Error updating user" });
+      } catch (err) {
+        console.error("Error updating user:", err);
+        return res.status(500).json({ error: "Error updating user" });
       }
     });
   } catch (err) {
-    next(err);
+    console.error("Error in file upload:", err);
+    return res.status(500).json({ error: "Error in file upload" });
   }
 };
 

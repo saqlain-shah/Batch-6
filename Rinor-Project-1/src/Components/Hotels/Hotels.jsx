@@ -70,7 +70,9 @@ const Hotel = () => {
         "http://localhost:8000/api/hotels/hotels"
       );
       console.log("data", response.data);
-
+      response.data.map(
+        (data) => (data.photos = `http://localhost:8000/${data.photos}`)
+      );
       setHotelList(response.data);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -125,7 +127,7 @@ const Hotel = () => {
 
   useEffect(() => {
     fetchHotelData();
-  }, [hotelList]);
+  }, []);
 
   const columns = useMemo(
     () => [
@@ -150,7 +152,7 @@ const Hotel = () => {
                 <img
                   alt="avatar"
                   height={50}
-                  // src={window.URL.createObjectURL(row.original.photos)}
+                  src={row.original.photos}
                   loading="lazy"
                   style={{ border: "2px solid teal", borderRadius: "5px" }}
                 />
