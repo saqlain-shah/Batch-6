@@ -12,12 +12,87 @@ import {
   MenuItem,
   Modal,
   TextField,
+  FormControlLabel,
+  Checkbox,
   Typography,
 } from "@mui/material";
 import { data } from "./RoomsData";
-import { Delete, Edit } from "@mui/icons-material";
+import { Edit, Delete, Visibility } from "@mui/icons-material";
+// import { data } from "./HotelsData";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const Rooms = () => {
+const Room = ({ hotelId, rooms }) => {
+  const Navigate = useNavigate();
+  const [roomList, setRoomList] = useState([]);
+  const [id, setId] = useState("");
+  const [roomData, setRoomData] = useState({
+    title: "",
+    photos: null,
+    price: "",
+    bed: "",
+    maxPeople: "",
+    status: false,
+    desc: "",
+  });
+  const resetForm = () => {
+    setRoomData({
+      title: "",
+      photos: null,
+      price: "",
+      bed: "",
+      maxPeople: "",
+      status: false,
+      desc: "",
+    });
+  };
+
+  // const handleChange = (event) => {
+  //   const { name, value, type } = event.target;
+  //   const newValue =
+  //     type === "checkbox"
+  //       ? event.target.checked
+  //       : type === "file"
+  //       ? event.target.files[0]
+  //       : value;
+  //   setRoomData({ ...roomData, [name]: newValue });
+  // };
+
+  const handleCreateRoom = async (e) => {
+    e.preventDefault();
+    if (id === "") {
+      const formData = new FormData();
+      Object.entries(roomData).forEach(([key, value]) => {
+        formData.append(key, value);
+      });
+      //  const {id, ...data}=hotelData
+      await axios
+        .post(`http://localhost:8000/api/rooms/${hotelId}`, formData)
+        .then((res) => console.log("reponse", res.data));
+      resetForm();
+      setIsModalOpen(false);
+    } else {
+      // console.log("id", id);
+      await handleUpdate(id);
+    }
+  };
+
+  const handleUpdate = async (id) => {
+    try {
+      console.log("id", id);
+
+      await axios
+        .put(`http://localhost:8000/api/rooms/${id}`, roomData)
+        .then(() => {
+          resetForm();
+          setId("");
+          setIsModalOpen(false);
+        });
+    } catch (error) {
+      console.error("Error updating data:", error);
+    }
+  };
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleModalOpen = () => {
@@ -28,58 +103,69 @@ const Rooms = () => {
     setIsModalOpen(false);
   };
 
+  const handleChange = (e) => {
+    const { name, value, type, checked, files } = e.target;
+    setRoomData((prevData) => ({
+      ...prevData,
+      [name]:
+        type === "file" ? files[0] : type === "checkbox" ? checked : value,
+    }));
+  };
+
   const columns = useMemo(
     () => [
-      {
-        id: "avatar",
-        header: "Image",
-        size: 50,
-        Cell: ({ row }) => (
-          <Box sx={{ display: "flex", alignItems: "center" }}>
-            <img
-              alt="room"
-              height={100}
-              src={row.original.avatar}
-              loading="lazy"
-              style={{ border: "2px solid teal", borderRadius: "5px" }}
-            />
-          </Box>
-        ),
-      },
       {
         id: "rooms",
         header: "All Rooms",
         columns: [
           {
-            accessorFn: (row) => row.id,
-            id: "id",
-            header: "#",
+            accessorKey: "titleAndPhotos",
+            header: "Title & Photos",
             size: 50,
+            Cell: ({ row }) => (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <img
+                  alt="room"
+                  height={50}
+                  src={`http://localhost:8000/${row.original.photos}`}
+                  loading="lazy"
+                  style={{ border: "2px solid teal", borderRadius: "5px" }}
+                />
+                <div>{row.original.title}</div>
+              </Box>
+            ),
           },
           {
-            accessorKey: "roomType",
-            header: "Type",
-            size: 50,
-          },
-          {
-            accessorKey: "bedType",
+            accessorKey: "bed",
             header: "Bed",
             size: 50,
           },
           {
-            accessorKey: "nightlyRate",
-            header: "Rent",
+            accessorKey: "maxPeople",
+            header: "Capacity",
             size: 50,
           },
           {
-            accessorKey: "isBooked",
+            accessorKey: "price",
+            header: "Price",
+            size: 50,
+          },
+          {
+            accessorKey: "status",
             header: "Status",
             size: 100,
             Cell: ({ cell }) => (
               <Box
                 component="span"
                 sx={(theme) => ({
-                  backgroundColor: cell.getValue()
+                  backgroundColor: !cell.getValue()
                     ? theme.palette.success.main
                     : theme.palette.warning.main,
                   color: "#fff",
@@ -88,7 +174,7 @@ const Rooms = () => {
                   fontWeight: "500",
                 })}
               >
-                {cell.getValue() ? "Available" : "Booked"}{" "}
+                {!cell.getValue() ? "Available" : "Booked"}{" "}
                 {/* Updated logic to display Paid or Unpaid */}
               </Box>
             ),
@@ -101,7 +187,18 @@ const Rooms = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data,
+    data: rooms
+      ? rooms
+      : {
+          title: "",
+          photos: null,
+          price: "",
+          bed: "",
+          maxPeople: "",
+          status: false,
+          desc: "",
+        },
+
     enableColumnFilterModes: true,
     enableColumnOrdering: true,
     enableGrouping: true,
@@ -207,32 +304,76 @@ const Rooms = () => {
             overflowY: "auto",
           }}
         >
-          <form>
+          <form onSubmit={handleCreateRoom}>
             <Typography variant="h5">Add New Room</Typography>
             <TextField
               variant="standard"
-              label="Type"
+              label="Title"
+              name="title"
+              value={roomData.title}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <TextField
+              variant="standard"
+              type="file"
+              label="Photos"
+              name="photos"
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+              InputLabelProps={{ shrink: true }}
+            />
+            <TextField
+              variant="standard"
+              label="Rent"
+              name="price"
+              value={roomData.price}
+              onChange={handleChange}
               fullWidth
               margin="normal"
             />
             <TextField
               variant="standard"
               label="Bed"
+              name="bed"
+              value={roomData.bed}
+              onChange={handleChange}
               fullWidth
               margin="normal"
             />
             <TextField
               variant="standard"
-              label="Rent"
+              label="Max People"
+              name="maxPeople"
+              value={roomData.maxPeople}
+              onChange={handleChange}
               fullWidth
               margin="normal"
             />
+            <TextField
+              variant="standard"
+              label="Description"
+              name="desc"
+              value={roomData.desc}
+              onChange={handleChange}
+              fullWidth
+              margin="normal"
+            />
+            <FormControlLabel
+              control={
+                <Checkbox
+                  name="status"
+                  checked={roomData.status}
+                  onChange={handleChange}
+                />
+              }
+              label="Status"
+            />
+
             <Box mt={2}>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleModalClose}
-              >
+              <Button variant="contained" color="primary" type="submit">
                 Add Room
               </Button>
             </Box>
@@ -243,4 +384,4 @@ const Rooms = () => {
   );
 };
 
-export default Rooms;
+export default Room;
