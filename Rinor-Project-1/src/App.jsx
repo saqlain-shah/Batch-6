@@ -96,7 +96,6 @@ function App() {
   const menuItems = [
     { title: "Dashboard", icon: <DashboardIcon />, path: "/" },
     { title: "Hotels", icon: <NightShelterIcon />, path: "/hotels" },
-    { title: "Rooms", icon: <HotelIcon />, path: "/rooms" },
     { title: "Bookings", icon: <BookIcon />, path: "/bookings" },
     { title: "Users", icon: <GroupIcon />, path: "/users" },
   ];
@@ -205,8 +204,6 @@ function App() {
             <Route path="/hotels" element={<Hotels />} />
             <Route path='/hotel/:id' element={<SingleHotel />} />
             <Route path="/bookings" element={<Bookings />} />
-            <Route path="/rooms" element={<Rooms />} />
-            {/* <Route path="/dummy" element={<Dummy />} /> */}
           </Routes>
         </Main>
       </Box>

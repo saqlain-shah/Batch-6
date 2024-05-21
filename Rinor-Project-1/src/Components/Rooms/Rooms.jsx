@@ -17,7 +17,7 @@ import {
 import { data } from "./RoomsData";
 import { Delete, Edit } from "@mui/icons-material";
 
-const Example = () => {
+const Rooms = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleModalOpen = () => {
@@ -243,4 +243,4 @@ const Example = () => {
   );
 };
 
-export default Example;
+export default Rooms;

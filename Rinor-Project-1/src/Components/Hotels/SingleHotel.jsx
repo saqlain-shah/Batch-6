@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Box, Button, Card, CardContent, Typography } from "@mui/material";
 import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import Rooms from "../Rooms/Rooms";
 
 const SingleHotel = () => {
   const Navigate = useNavigate();
@@ -78,6 +79,7 @@ const SingleHotel = () => {
         </CardContent>
       </Card>
       </Box>
+      <Rooms/>
     </>
   );
 };
