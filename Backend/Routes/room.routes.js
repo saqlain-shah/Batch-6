@@ -8,10 +8,11 @@ import {
   updateRoomAvailability,
 } from "../Controller/room.controller.js";
 import { verifyAdmin } from "../Utils/verifyToken.js";
+import upload from "../Utils/multer.js";
 
 const router = express.Router();
 //CREATE
-router.post("/:hotelid", createRoom);
+router.post("/:hotelid", upload.single('photos'), createRoom);
 
 //UPDATE
 router.put("/availability/:id", updateRoomAvailability);

@@ -12,13 +12,10 @@ import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import path from 'path';
 
-
-
 const app = express();
 dotenv.config();
 
-
-app.use(express.static('uploads'));
+// Serve static files (images)
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 app.use('/Uploads', express.static(path.join(__dirname, 'Uploads')));

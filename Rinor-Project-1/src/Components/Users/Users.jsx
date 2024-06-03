@@ -23,9 +23,6 @@ import {
 import { Edit, Delete, Visibility } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 
-// Users Data
-// import { data } from "./usersData";
-
 const User = () => {
   const Navigate = useNavigate();
   const [userList, setUserList] = useState([]);
@@ -59,7 +56,7 @@ const User = () => {
       const response = await axios.get("http://localhost:8000/api/users/");
       console.log("response: ", response.data);
       response.data.users.map(
-        (data) => (data.photos = `http://localhost:8000/${data.photos}`)
+        (users) => (users.photos = `http://localhost:8000/${users.photos}`)
       );
       setUserList(response.data.users);
     } catch (error) {
@@ -68,32 +65,30 @@ const User = () => {
   };
 
   const handleUpdateUser = async () => {
-    if (id === "") {
+    if (id) {
       const formData = new FormData();
       Object.entries(userData).forEach(([key, value]) => {
         formData.append(key, value);
       });
-      await axios.put(`http://localhost:8000/api/users/`, formData);
-    } else {
-      await handleUpdate(id);
+      await axios.put(`http://localhost:8000/api/users/${id}`, formData);
     }
-    // console.log("userData:", userData);
+    
     setIsModalOpen(false);
   };
 
-  const handleUpdate = async (id) => {
-    try {
-      console.log("id", id);
-      await axios
-        .put(`http://localhost:8000/api/users/${id}`, userData)
-        .then(() => {
-          setId("");
-          setIsModalOpen(false);
-        });
-    } catch (error) {
-      console.error("Error updating data:", error);
-    }
-  };
+  // const handleUpdate = async (id) => {
+  //   try {
+  //     console.log("id", id);
+  //     await axios
+  //       .put(`http://localhost:8000/api/users/${id}`, userData)
+  //       .then(() => {
+  //         setId("");
+  //         setIsModalOpen(false);
+  //       });
+  //   } catch (error) {
+  //     console.error("Error updating data:", error);
+  //   }
+  // };
 
   let handleDelete = async (id) => {
     // console.log("id", id);
