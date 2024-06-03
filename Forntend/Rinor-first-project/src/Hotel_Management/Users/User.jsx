@@ -114,13 +114,15 @@ const User = () => {
   const columns = useMemo(
     () => [
       {
-        id: "users", // id used to define `group` column
-        header: "Users",
+        id: "Users-Identities",
+        header: "Users-Identities",
         columns: [
           {
-            accessorFn: (row) => `${row.firstName} ${row.lastName}`, // accessorFn used to join multiple data into a single cell
-            id: "name", // id is still required when using accessorFn instead of accessorKey
-            header: "Name",
+            accessorKey:"firstName",
+           
+            id: "firstName",
+          
+            header: "First-Name",
             size: 200,
             Cell: ({ renderedCellValue, row }) => (
               <Box
@@ -135,19 +137,23 @@ const User = () => {
                   height={50}
                   src={row.original.photo}
                   loading="lazy"
-                  style={{ border: "2px solid teal", borderRadius: "50%" }}
+                  style={{ border: "2px solid teal", borderRadius: "5px" }}
                 />
-                {/* using renderedCellValue instead of cell.getValue() preserves filter match highlighting */}
                 <span>{renderedCellValue}</span>
               </Box>
             ),
+          },
+          {
+            accessorKey: "lastName",
+            header: "last-Name",
+            size: 150,
           },
           {
             accessorKey: "email",
             enableClickToCopy: true,
             filterVariant: "autocomplete",
             header: "Email",
-            size: 300,
+            size:150,
           },
           {
             accessorKey: "isAdmin",
@@ -213,19 +219,25 @@ const User = () => {
         sx={{
           alignItems: "center",
           display: "flex",
-          justifyContent: "space-around",
-          left: "30px",
-          maxWidth: "1000px",
-          position: "sticky",
-          width: "100%",
+          flexDirection: "column",
+          justifyContent: "center",
+          padding: "16px",
+          textAlign: "center",
+          maxWidth: "40%",
         }}
       >
         <img
           alt="avatar"
-          height={150}
-          src={row.original.photos}
+          src={row.original.photo}
           loading="lazy"
-          style={{ border: "5px solid teal", borderRadius: "50%" }}
+          style={{
+            maxWidth: "100%",
+            height: "auto",
+            border: "2px solid teal",
+            borderRadius: "5px",
+            marginBottom: "16px",
+            marginLeft: "10%",
+          }}
         />
       </Box>
     ),

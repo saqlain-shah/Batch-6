@@ -18,7 +18,7 @@ import { Edit, Delete, Visibility } from "@mui/icons-material";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const Hotels = () => {
+const Hotel = () => {
   const Navigate = useNavigate();
   const [hotelList, setHotelList] = useState([]);
   const [id, setId] = useState("");
@@ -33,6 +33,7 @@ const Hotels = () => {
     type: "",
     title: "",
     desc: "",
+    photos: null,
   });
 
   const resetForm = () => {
@@ -50,14 +51,13 @@ const Hotels = () => {
     });
   };
   const handleChange = (event) => {
-    const { name, value, type } = event.target;
-    const newValue =
-      type === "checkbox"
-        ? event.target.checked
-        : type === "file"
-        ? event.target.files[0] // Get the file object from the event
-        : value;
-    setHotelData({ ...hotelData, [name]: newValue });
+    const { name, value, type, checked, files } = event.target;
+
+    setHotelData((prevData) => ({
+      ...prevData,
+      [name]:
+        type === "file" ? files[0] : type === "checkbox" ? checked : value,
+    }));
   };
   const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -98,9 +98,14 @@ const Hotels = () => {
   const handleUpdate = async (id) => {
     try {
       console.log("id", id);
-
+      const formData = new FormData();
+      Object.entries(hotelData).forEach(([key, value]) => {
+        if (key !== "rooms") {
+          formData.append(key, value);
+        }
+      });
       await axios
-        .put(`http://localhost:8000/api/hotel/${id}`, hotelData)
+        .put(`http://localhost:8000/api/hotel/${id}`, formData)
         .then(() => {
           resetForm();
           setId("");
@@ -424,8 +429,13 @@ const Hotels = () => {
               value={hotelData.desc}
               onChange={handleChange}
             />
-            <input type="file" name="photos" onChange={handleChange} />
-
+            <Box
+              sx={{
+                margin: "1rem 0 1rem 0",
+              }}
+            >
+              <input type="file" name="photos" onChange={handleChange} />
+            </Box>
             {/* Other fields */}
             <Box
               sx={{
@@ -460,4 +470,4 @@ const Hotels = () => {
   );
 };
 
-export default Hotels;
+export default Hotel;
