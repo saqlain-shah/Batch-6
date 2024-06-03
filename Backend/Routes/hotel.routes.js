@@ -9,6 +9,8 @@ import {
   countByType,
   getHotelRooms,
 } from "../Controller/Hotels.js";
+import upload from "../Utils/multer.js";
+
 // import { verifyAdmin } from "../utils/verifyToken.js";
 const router = express.Router();
 
@@ -16,7 +18,7 @@ const router = express.Router();
 router.post("/", createHotel);
 
 //UPDATE
-router.put("/:id", updateHotel);
+router.put("/:id", upload.single('photos'), updateHotel);
 //DELETE
 router.delete("/:id", deleteHotel);
 //GET
