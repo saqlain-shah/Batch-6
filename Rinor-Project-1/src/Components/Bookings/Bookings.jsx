@@ -1,31 +1,35 @@
 /* eslint-disable react/prop-types */
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import {
   MaterialReactTable,
   useMaterialReactTable,
 } from "material-react-table";
+import axios from "axios";
 import {
-  Box,
+  
   ListItemIcon,
   MenuItem,
-  Button,
-  Modal,
-  TextField,
-  Typography,
+  
 } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
-import { data } from "./BookingsData";
+// import { data } from "./BookingsData";
 
 const Example = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [booking, setBooking] = useState(null);
 
-  const handleModalOpen = () => {
-    setIsModalOpen(true);
+  const fetchRoom = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/booking/`);
+      console.log(response);
+      setBooking(response.data);
+    } catch (err) {
+      console.error(err);
+    }
   };
+  useEffect(() => {
+    fetchRoom();
+  }, []);
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
   const columns = useMemo(
     () => [
       {
@@ -33,65 +37,21 @@ const Example = () => {
         header: "All Bookings",
         columns: [
           {
-            accessorFn: (row) => `${row.firstName} ${row.lastName}`,
+            accessorKey: "name",
             id: "name",
             header: "Name",
-            size: 200,
-            Cell: ({ renderedCellValue, row }) => (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "1rem",
-                }}
-              >
-                <img
-                  alt="avatar"
-                  height={50}
-                  src={row.original.avatar}
-                  loading="lazy"
-                  style={{ border: "2px solid teal", borderRadius: "50%" }}
-                />
-                <span>{renderedCellValue}</span>
-              </Box>
-            ),
           },
           {
-            accessorKey: "mobile",
+            accessorKey: "contact",
             header: "Mobile",
-            size: 150,
           },
           {
-            accessorKey: "arrive",
+            accessorKey: "fromDate",
             header: "Arrive",
-            size: 150,
           },
           {
-            accessorKey: "depart",
+            accessorKey: "toDate",
             header: "Depart",
-            size: 150,
-          },
-          {
-            accessorKey: "isPaid", // Corrected accessorKey
-            header: "Payment", // Changed header
-            size: 150,
-            Cell: ({ cell }) => (
-              <Box
-                component="span"
-                sx={(theme) => ({
-                  backgroundColor: cell.getValue()
-                    ? theme.palette.success.main
-                    : theme.palette.error.main,
-                  color: "#fff",
-                  borderRadius: "0.25rem",
-                  padding: "0.25rem",
-                  fontWeight: "bold",
-                })}
-              >
-                {cell.getValue() ? "Paid" : "Unpaid"}{" "}
-                {/* Updated logic to display Paid or Unpaid */}
-              </Box>
-            ),
           },
         ],
       },
@@ -101,7 +61,7 @@ const Example = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data,
+    data: booking || [],
     enableColumnFilterModes: true,
     enableColumnOrdering: true,
     enableGrouping: true,
@@ -129,27 +89,6 @@ const Example = () => {
       shape: "rounded",
       variant: "outlined",
     },
-    renderDetailPanel: ({ row }) => (
-      <Box
-        sx={{
-          alignItems: "center",
-          display: "flex",
-          justifyContent: "space-around",
-          left: "30px",
-          maxWidth: "1000px",
-          position: "sticky",
-          width: "100%",
-        }}
-      >
-        <img
-          alt="avatar"
-          height={150}
-          src={row.original.avatar}
-          loading="lazy"
-          style={{ border: "5px solid teal", borderRadius: "50%" }}
-        />
-      </Box>
-    ),
     renderRowActionMenuItems: ({ closeMenu, table }) => [
       <MenuItem
         key="edit"
@@ -183,73 +122,8 @@ const Example = () => {
 
   return (
     <>
-      <Box mb={2} textAlign="right">
-        <Button variant="contained" color="primary" onClick={handleModalOpen}>
-          ADD NEW+
-        </Button>
-      </Box>
+      
       <MaterialReactTable table={table} />
-
-      {/* New Bookink Form */}
-      <Modal open={isModalOpen} onClose={handleModalClose}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            width: 400,
-            maxWidth: "90%",
-            maxHeight: "90%",
-            overflowY: "auto",
-          }}
-        >
-          <form>
-            <Typography variant="h5">Add New Bookings</Typography>
-            <TextField
-              variant="standard"
-              label="First Name"
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              variant="standard"
-              label="Last Name"
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              variant="standard"
-              label="Mobile"
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              variant="standard"
-              label="Arrive"
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              variant="standard"
-              label="Depart"
-              fullWidth
-              margin="normal"
-            />
-            {/* Other fields */}
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleModalClose}
-            >
-              Add Booking
-            </Button>
-          </form>
-        </Box>
-      </Modal>
     </>
   );
 };
