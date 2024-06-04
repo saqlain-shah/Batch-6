@@ -44,9 +44,10 @@ export const createBooking = async (req, res, next) => {
             fromDate,
             toDate,
         });
+        const newUnavailableDates = [...room.unavailableDates, { fromDate: fromDate, toDate: toDate }]
         await Room.findByIdAndUpdate(
             roomId,
-            { $set: { ...room, unavailableDates: [fromDate, toDate] } },
+            { $set: { unavailableDates: newUnavailableDates } },
             { new: true }
         );
         await newBooking.save();

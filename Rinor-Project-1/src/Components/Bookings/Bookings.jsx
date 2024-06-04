@@ -5,12 +5,7 @@ import {
   useMaterialReactTable,
 } from "material-react-table";
 import axios from "axios";
-import {
-  
-  ListItemIcon,
-  MenuItem,
-  
-} from "@mui/material";
+import { ListItemIcon, MenuItem } from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 // import { data } from "./BookingsData";
 
@@ -21,7 +16,13 @@ const Example = () => {
     try {
       const response = await axios.get(`http://localhost:8000/api/booking/`);
       console.log(response);
-      setBooking(response.data);
+      setBooking(
+        response.data.map((data) => ({
+          ...data,
+          fromDate: data.fromDate.split("T")[0],
+          toDate: data.toDate.split("T")[0],
+        }))
+      );
     } catch (err) {
       console.error(err);
     }
@@ -122,7 +123,6 @@ const Example = () => {
 
   return (
     <>
-      
       <MaterialReactTable table={table} />
     </>
   );
