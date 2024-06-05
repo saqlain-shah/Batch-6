@@ -82,22 +82,12 @@ export const checkOut = async (req, res, next) => {
         try {
             if (booking) {
                 const { roomId, fromDate, toDate } = booking
-                console.log("booking data", roomId, fromDate, toDate)
-                const room = await Room.findById(roomId);
-                const updatedDates = room.unavailableDates.filter((date) => {
-                    return date.fromDate !== fromDate || date.toDate !== toDate;
-                });
-                console.log("updatedDates", updatedDates);
+                
                 await Room.findByIdAndUpdate(
                     roomId,
                     { '$pull': { unavailableDates: { fromDate: fromDate, toDate: toDate } } }
                  
                 );
-                // await Room.findByIdAndUpdate(
-                //     roomId,
-                //     { $set: { unavailableDates: updatedDates } },
-                //     { new: true }
-                // )
 
             }
             else {
