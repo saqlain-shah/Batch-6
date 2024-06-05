@@ -82,11 +82,10 @@ export const checkOut = async (req, res, next) => {
         try {
             if (booking) {
                 const { roomId, fromDate, toDate } = booking
-                
+
                 await Room.findByIdAndUpdate(
                     roomId,
                     { '$pull': { unavailableDates: { fromDate: fromDate, toDate: toDate } } }
-                 
                 );
 
             }
@@ -104,6 +103,28 @@ export const checkOut = async (req, res, next) => {
         res.status(200).json({
             status: true,
             message: `Customer has been checked out`,
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// get single booking   
+export const getBooking = async (req, res, next) => {
+    try {
+        const booking = await Booking.findById(req.params.id);
+
+        if (!booking) {
+            return res.status(404).send({
+                success: false,
+                message: "Booking not found.",
+            });
+        }
+
+        res.status(200).send({
+            success: true,
+            message: "Booking has been displayed successfully.",
+            booking: booking,
         });
     } catch (err) {
         next(err);

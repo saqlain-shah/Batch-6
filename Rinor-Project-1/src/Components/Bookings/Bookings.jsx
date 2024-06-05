@@ -1,15 +1,18 @@
 /* eslint-disable react/prop-types */
 import { useState, useMemo, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   MaterialReactTable,
   useMaterialReactTable,
 } from "material-react-table";
 import axios from "axios";
 import { ListItemIcon, MenuItem } from "@mui/material";
-import { Edit, Delete } from "@mui/icons-material";
+import { Delete, Visibility } from "@mui/icons-material";
 // import { data } from "./BookingsData";
 
-const Example = () => {
+const Bookings = () => {
+  const Navigate = useNavigate();
+
   const [booking, setBooking] = useState(null);
 
   const fetchRoom = async () => {
@@ -96,25 +99,25 @@ const Example = () => {
       shape: "rounded",
       variant: "outlined",
     },
-    renderRowActionMenuItems: ({ closeMenu, row }) => [
+    renderRowActionMenuItems: (params) => [
       <MenuItem
-        key="edit"
+        key="view"
         onClick={() => {
-          // Edit logic...
-          closeMenu();
+          Navigate(`/booking/${params.row.original._id}`);
+          params.closeMenu();
         }}
         sx={{ m: 0 }}
       >
         <ListItemIcon>
-          <Edit />
+          <Visibility />
         </ListItemIcon>
-        Edit
+        Veiw
       </MenuItem>,
       <MenuItem
         key="delete"
         onClick={() => {
-          handleDelete(row.original._id);
-          closeMenu();
+          handleDelete(params.row.original._id);
+          params.closeMenu();
         }}
         sx={{ m: 0 }}
       >
@@ -133,4 +136,4 @@ const Example = () => {
   );
 };
 
-export default Example;
+export default Bookings;

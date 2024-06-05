@@ -2,8 +2,9 @@ import express from "express";
 import {
   createBooking,
   bookingList,
-//   bookingSearch,
+  //   bookingSearch,
   checkOut,
+  getBooking,
 } from "../Controller/booking.controller.js";
 // import { verifyUser } from "../utils/verifyToken.js";
 const router = express.Router();
@@ -15,5 +16,8 @@ router.get("/", bookingList);
 // router.get("/search/:id", verifyUser, bookingSearch);
 //Check Out
 router.delete("/:id", checkOut);
+
+// GET
+router.get("/:id", getBooking);
 
 export default router;
