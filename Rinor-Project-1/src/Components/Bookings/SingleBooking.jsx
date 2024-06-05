@@ -29,7 +29,7 @@ const SingleBooking = () => {
   const fetchBookingData = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:8000/api/booking/${params.id}`
+      `http://localhost:8000/api/booking/${params.id}`
       );
       setBookingData(res.data.booking);
       fetchHotelData(res.data.booking.hotelId); // Fetch hotel data after booking data is fetched
