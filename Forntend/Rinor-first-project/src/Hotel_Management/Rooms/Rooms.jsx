@@ -16,9 +16,7 @@ import {
   Checkbox,
   Typography,
 } from "@mui/material";
-// import { data } from "./RoomsData";
 import { Edit, Delete, Visibility } from "@mui/icons-material";
-// import { data } from "./HotelsData";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
