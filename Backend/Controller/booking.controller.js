@@ -1,6 +1,7 @@
 import Booking from "../Models/booking.model.js";
 import Room from "../Models/room.model.js";
 
+// Create a new booking bookings
 export const createBooking = async (req, res, next) => {
     try {
         const { hotelId, roomId } = req.params;
@@ -67,6 +68,53 @@ export const bookingList = async (req, res, next) => {
     try {
         const bookings = await Booking.find();
         res.status(200).json(bookings);
+    } catch (err) {
+        next(err);
+    }
+};
+
+// Check out a customer by deleting their booking
+export const checkOut = async (req, res, next) => {
+    const { id } = req.params;
+
+    try {
+        const booking = await Booking.findById(id);
+        try {
+            if (booking) {
+                const { roomId, fromDate, toDate } = booking
+                console.log("booking data", roomId, fromDate, toDate)
+                const room = await Room.findById(roomId);
+                const updatedDates = room.unavailableDates.filter((date) => {
+                    return date.fromDate !== fromDate || date.toDate !== toDate;
+                });
+                console.log("updatedDates", updatedDates);
+                await Room.findByIdAndUpdate(
+                    roomId,
+                    { '$pull': { unavailableDates: { fromDate: fromDate, toDate: toDate } } }
+                 
+                );
+                // await Room.findByIdAndUpdate(
+                //     roomId,
+                //     { $set: { unavailableDates: updatedDates } },
+                //     { new: true }
+                // )
+
+            }
+            else {
+                return res.status(404).json({
+                    status: false,
+                    message: `Booking with ID ${id} not found`,
+                });
+            }
+        } catch (err) {
+            return res.status(500).send(err.message)
+        }
+        await Booking.findByIdAndDelete(id);
+
+        res.status(200).json({
+            status: true,
+            message: `Customer has been checked out`,
+        });
     } catch (err) {
         next(err);
     }

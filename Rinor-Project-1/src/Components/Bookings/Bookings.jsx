@@ -31,6 +31,12 @@ const Example = () => {
     fetchRoom();
   }, []);
 
+  const handleDelete = async (id) => {
+    await axios
+      .delete(`http://localhost:8000/api/booking/${id}`)
+      .then(fetchRoom());
+  };
+
   const columns = useMemo(
     () => [
       {
@@ -90,7 +96,7 @@ const Example = () => {
       shape: "rounded",
       variant: "outlined",
     },
-    renderRowActionMenuItems: ({ closeMenu, table }) => [
+    renderRowActionMenuItems: ({ closeMenu, row }) => [
       <MenuItem
         key="edit"
         onClick={() => {
@@ -107,8 +113,7 @@ const Example = () => {
       <MenuItem
         key="delete"
         onClick={() => {
-          const selectedRows = table.getSelectedRowModel().flatRows;
-          selectedRows.forEach((row) => table.deleteRow(row.id));
+          handleDelete(row.original._id);
           closeMenu();
         }}
         sx={{ m: 0 }}
