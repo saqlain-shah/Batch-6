@@ -1,5 +1,6 @@
 import Booking from "../Models/booking.model.js";
 import Room from "../Models/room.model.js";
+import Hotel from "../Models/hotel.model.js";
 
 // Create a new booking bookings
 export const createBooking = async (req, res, next) => {
@@ -120,11 +121,28 @@ export const getBooking = async (req, res, next) => {
                 message: "Booking not found.",
             });
         }
+        const { hotelId, roomId } = booking;
+        const hotel = await Hotel.findById(hotelId)
+        if (!hotel) {
+            return res.status(404).send({
+                success: false,
+                message: "Hotel not found.",
+            });
+        }
+        const { name, city, address } = hotel;
+        const bookedRoom = await Room.findById(roomId);
+        if (!bookedRoom) {
+            return res.status(404).send({
+                success: false,
+                message: "bookedRoom not found.",
+            });
+        }
 
+        const bookingInfo = { ...booking, hotelName: name, hotelCity: city, hotelAddress: address, roomName: bookedRoom.title }
         res.status(200).send({
             success: true,
             message: "Booking has been displayed successfully.",
-            booking: booking,
+            booking: bookingInfo
         });
     } catch (err) {
         next(err);

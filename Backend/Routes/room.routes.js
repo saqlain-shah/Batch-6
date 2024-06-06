@@ -16,7 +16,7 @@ router.post("/:hotelid", upload.single('photos'), createRoom);
 
 //UPDATE
 router.put("/availability/:id", updateRoomAvailability);
-router.put("/:id", updateRoom);
+router.put("/:id", upload.single('photos'), updateRoom);
 //DELETE
 router.delete("/:id/:hotelid", deleteRoom);
 //GET

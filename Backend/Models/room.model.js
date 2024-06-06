@@ -14,6 +14,9 @@ const RoomSchema = new mongoose.Schema(
       type: Number,
 
     },
+    photos: {
+      type: String,
+    },
     bed: {
       type: Number
     },

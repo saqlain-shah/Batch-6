@@ -10,44 +10,39 @@ const SingleBooking = () => {
     fromDate: "",
     toDate: "",
     hotelId: "",
+    hotelName: "",
+    hotelCity: "",
+    hotelAddress: "",
+    roomName: "",
   });
 
-  const [hotelData, setHotelData] = useState({
-    name: "",
-    type: "",
-    city: "",
-    address: "",
-    rating: 0,
-    cheapestPrice: 0,
-    featured: false,
-    title: "",
-    desc: "",
-  });
+  // const [hotelData, setHotelData] = useState({
+  //   name: "",
+  //   type: "",
+  //   city: "",
+  //   address: "",
+  //   rating: 0,
+  //   cheapestPrice: 0,
+  //   featured: false,
+  //   title: "",
+  //   desc: "",
+  // });
 
   const params = useParams();
 
   const fetchBookingData = async () => {
     try {
       const res = await axios.get(
-      `http://localhost:8000/api/booking/${params.id}`
+        `http://localhost:8000/api/booking/${params.id}`
       );
-      setBookingData(res.data.booking);
-      fetchHotelData(res.data.booking.hotelId); // Fetch hotel data after booking data is fetched
+      const { _doc, ...rest } = res.data.booking;
+      setBookingData({ ..._doc, ...rest });
     } catch (error) {
       console.error("Error fetching booking data:", error);
     }
   };
 
-  const fetchHotelData = async (hotelId) => {
-    try {
-      const res = await axios.get(
-        `http://localhost:8000/api/hotels/search/${hotelId}`
-      );
-      setHotelData(res.data);
-    } catch (error) {
-      console.error("Error fetching hotel data:", error);
-    }
-  };
+  
 
   useEffect(() => {
     fetchBookingData();
@@ -57,39 +52,25 @@ const SingleBooking = () => {
     <Box>
       <Card>
         <CardContent>
-          <Typography variant="h5" component="h2">
-            {hotelData.name}
+          <Typography variant="h5">Hotel Detail</Typography>
+          <Typography variant="h4" component="h2">
+            {bookingData.hotelName}
           </Typography>
           <Typography color="textSecondary" gutterBottom>
-            {hotelData.city}
+            {bookingData.hotelCity}
           </Typography>
-          <Typography variant="body2" component="p">
-            Type: {hotelData.type}
+          <Typography color="body2" component="p">
+            Room Title: {bookingData.roomName}
           </Typography>
-          <Typography variant="body2" component="p">
-            Address: {hotelData.address}
-          </Typography>
-          <Typography variant="body2" component="p">
-            Rating: {hotelData.rating}
-          </Typography>
-          <Typography variant="body2" component="p">
-            Cheapest Price: {hotelData.cheapestPrice}
-          </Typography>
-          <Typography variant="body2" component="p">
-            Featured: {hotelData.featured ? "Yes" : "No"}
-          </Typography>
-          <Typography variant="body2" component="p">
-            Title: {hotelData.title}
-          </Typography>
-          <Typography variant="body2" component="p">
-            Description: {hotelData.desc}
-          </Typography>
-        </CardContent>
-      </Card>
 
-      <Card sx={{ marginTop: 2 }}>
-        <CardContent>
-          <Typography variant="h5" component="h2">
+          <Typography variant="body2" component="p">
+            Address: {bookingData.hotelAddress}
+          </Typography>
+
+          <Typography variant="h5" sx={{ mt: 2 }}>
+            Booking Details
+          </Typography>
+          <Typography variant="h4" component="h2">
             Name: {bookingData.name}
           </Typography>
           <Typography variant="body2" component="p">
