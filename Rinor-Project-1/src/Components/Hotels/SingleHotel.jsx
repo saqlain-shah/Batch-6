@@ -32,7 +32,7 @@ const SingleHotel = () => {
   };
   useEffect(() => {
     fetchHotelData();
-  }, []);
+  }, [params.id]);
   return (
     <>
       <Box>
@@ -90,7 +90,7 @@ const SingleHotel = () => {
               </Button>
             </Box>
           </CardContent>
-          <Rooms hotelId={params.id} rooms={data.rooms} />
+          <Rooms hotelId={params.id} rooms={data.rooms} setData={setData} />
         </Card>
       </Box>
     </>

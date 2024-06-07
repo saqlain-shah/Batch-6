@@ -28,7 +28,7 @@ import {
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
-const Room = ({ hotelId, rooms }) => {
+const Room = ({ hotelId, rooms, setData }) => {
   const Navigate = useNavigate();
   const [id, setId] = useState("");
   const [roomData, setRoomData] = useState({
@@ -88,12 +88,12 @@ const Room = ({ hotelId, rooms }) => {
       console.log("id", id);
       const formData = new FormData();
       Object.entries(roomData).forEach(([key, value]) => {
-        if (key !== "rooms") {
+        if (key !== "unavailableDates") {
           formData.append(key, value);
         }
       });
       await axios
-        .put(`http://localhost:8000/api/rooms/${id}`, formData)
+        .put(`http://localhost:8000/api/rooms/${id}/${hotelId}`, formData)
         .then((res) => {
           resetForm();
           setId("");
@@ -102,6 +102,30 @@ const Room = ({ hotelId, rooms }) => {
         });
     } catch (error) {
       console.error("Error updating data:", error);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      const confirmDelete = window.confirm(
+        "Are you sure you want to delete the data?"
+      );
+
+      if (confirmDelete) {
+        await axios.delete(`http://localhost:8000/api/rooms/${id}/${hotelId}`);
+
+        const filteredRooms = rooms.filter((val) => val._id !== id);
+
+        setData((prev) => ({
+          ...prev,
+          rooms: filteredRooms,
+        }));
+      }
+    } catch (error) {
+      console.error("Error deleting room:", error);
+      alert(
+        "An error occurred while trying to delete the room. Please try again."
+      );
     }
   };
 
@@ -293,6 +317,7 @@ const Room = ({ hotelId, rooms }) => {
       <MenuItem
         key="delete"
         onClick={() => {
+          handleDelete(params.row.original._id);
           params.closeMenu();
         }}
         sx={{ m: 0 }}

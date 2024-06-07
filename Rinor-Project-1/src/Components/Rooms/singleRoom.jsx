@@ -42,7 +42,7 @@ const RoomDetails = () => {
     };
 
     fetchRoom();
-    console.log("Room Data", room);
+    // console.log("Room Data", room);
   }, [roomId]);
 
   if (loading) return <CircularProgress />;
