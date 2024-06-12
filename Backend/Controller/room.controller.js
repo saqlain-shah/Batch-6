@@ -67,7 +67,7 @@ export const deleteRoom = async (req, res, next) => {
 
     // Remove the room from the hotel
     await Hotel.findByIdAndUpdate(hotelid, {
-      '$pull': { rooms: id },
+      '$pull': { rooms: room },
     });
 
     // Delete the room

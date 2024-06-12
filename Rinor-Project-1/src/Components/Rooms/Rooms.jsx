@@ -112,7 +112,9 @@ const Room = ({ hotelId, rooms, setData }) => {
       );
 
       if (confirmDelete) {
-        await axios.delete(`http://localhost:8000/api/rooms/${id}/${hotelId}`);
+        await axios
+          .delete(`http://localhost:8000/api/rooms/${id}/${hotelId}`)
+          .then((res) => console.log("res", res));
 
         const filteredRooms = rooms.filter((val) => val._id !== id);
 
