@@ -31,6 +31,8 @@ import LoginForm from "./Components/LoginForm/Login";
 import Register from "./Components/LoginForm/Register";
 import SingleHotel from "./Components/Hotels/SingleHotel.jsx";
 import SingleUser from "./Components/Users/SingleUser.jsx";
+import RoomDetails from "./Components/Rooms/singleRoom.jsx";
+import SingleBooking from "./Components/Bookings/SingleBooking.jsx";
 // import './style.css';
 
 function App() {
@@ -203,7 +205,9 @@ function App() {
             <Route path="/user/:id" element={<SingleUser />} />
             <Route path="/hotels" element={<Hotels />} />
             <Route path='/hotel/:id' element={<SingleHotel />} />
+            <Route path='/room/:hotelId/:roomId' element={<RoomDetails />} />
             <Route path="/bookings" element={<Bookings />} />
+            <Route path="/booking/:id" element={<SingleBooking />} />
           </Routes>
         </Main>
       </Box>

@@ -24,7 +24,7 @@ router.get("/checkadmin/:id", verifyAdmin, (req, res, next) => {
 
 // UPDATE
 router.put("/:id", updateUser);
-
+//http://localhost:8000/api/user/:id
 // DELETE
 router.delete("/:id", deleteUser);
 

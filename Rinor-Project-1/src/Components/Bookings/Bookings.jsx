@@ -1,31 +1,45 @@
 /* eslint-disable react/prop-types */
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   MaterialReactTable,
   useMaterialReactTable,
 } from "material-react-table";
-import {
-  Box,
-  ListItemIcon,
-  MenuItem,
-  Button,
-  Modal,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { Edit, Delete } from "@mui/icons-material";
-import { data } from "./BookingsData";
+import axios from "axios";
+import { ListItemIcon, MenuItem } from "@mui/material";
+import { Delete, Visibility } from "@mui/icons-material";
+// import { data } from "./BookingsData";
 
-const Example = () => {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+const Bookings = () => {
+  const Navigate = useNavigate();
 
-  const handleModalOpen = () => {
-    setIsModalOpen(true);
+  const [booking, setBooking] = useState(null);
+
+  const fetchRoom = async () => {
+    try {
+      const response = await axios.get(`http://localhost:8000/api/booking/`);
+      console.log(response);
+      setBooking(
+        response.data.map((data) => ({
+          ...data,
+          fromDate: data.fromDate.split("T")[0],
+          toDate: data.toDate.split("T")[0],
+        }))
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  };
+  useEffect(() => {
+    fetchRoom();
+  }, []);
+
+  const handleDelete = async (id) => {
+    await axios
+      .delete(`http://localhost:8000/api/booking/${id}`)
+      .then(fetchRoom());
   };
 
-  const handleModalClose = () => {
-    setIsModalOpen(false);
-  };
   const columns = useMemo(
     () => [
       {
@@ -33,65 +47,21 @@ const Example = () => {
         header: "All Bookings",
         columns: [
           {
-            accessorFn: (row) => `${row.firstName} ${row.lastName}`,
+            accessorKey: "name",
             id: "name",
             header: "Name",
-            size: 200,
-            Cell: ({ renderedCellValue, row }) => (
-              <Box
-                sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "1rem",
-                }}
-              >
-                <img
-                  alt="avatar"
-                  height={50}
-                  src={row.original.avatar}
-                  loading="lazy"
-                  style={{ border: "2px solid teal", borderRadius: "50%" }}
-                />
-                <span>{renderedCellValue}</span>
-              </Box>
-            ),
           },
           {
-            accessorKey: "mobile",
+            accessorKey: "contact",
             header: "Mobile",
-            size: 150,
           },
           {
-            accessorKey: "arrive",
+            accessorKey: "fromDate",
             header: "Arrive",
-            size: 150,
           },
           {
-            accessorKey: "depart",
+            accessorKey: "toDate",
             header: "Depart",
-            size: 150,
-          },
-          {
-            accessorKey: "isPaid", // Corrected accessorKey
-            header: "Payment", // Changed header
-            size: 150,
-            Cell: ({ cell }) => (
-              <Box
-                component="span"
-                sx={(theme) => ({
-                  backgroundColor: cell.getValue()
-                    ? theme.palette.success.main
-                    : theme.palette.error.main,
-                  color: "#fff",
-                  borderRadius: "0.25rem",
-                  padding: "0.25rem",
-                  fontWeight: "bold",
-                })}
-              >
-                {cell.getValue() ? "Paid" : "Unpaid"}{" "}
-                {/* Updated logic to display Paid or Unpaid */}
-              </Box>
-            ),
           },
         ],
       },
@@ -101,7 +71,7 @@ const Example = () => {
 
   const table = useMaterialReactTable({
     columns,
-    data,
+    data: booking || [],
     enableColumnFilterModes: true,
     enableColumnOrdering: true,
     enableGrouping: true,
@@ -129,47 +99,25 @@ const Example = () => {
       shape: "rounded",
       variant: "outlined",
     },
-    renderDetailPanel: ({ row }) => (
-      <Box
-        sx={{
-          alignItems: "center",
-          display: "flex",
-          justifyContent: "space-around",
-          left: "30px",
-          maxWidth: "1000px",
-          position: "sticky",
-          width: "100%",
-        }}
-      >
-        <img
-          alt="avatar"
-          height={150}
-          src={row.original.avatar}
-          loading="lazy"
-          style={{ border: "5px solid teal", borderRadius: "50%" }}
-        />
-      </Box>
-    ),
-    renderRowActionMenuItems: ({ closeMenu, table }) => [
+    renderRowActionMenuItems: (params) => [
       <MenuItem
-        key="edit"
+        key="view"
         onClick={() => {
-          // Edit logic...
-          closeMenu();
+          Navigate(`/booking/${params.row.original._id}`);
+          params.closeMenu();
         }}
         sx={{ m: 0 }}
       >
         <ListItemIcon>
-          <Edit />
+          <Visibility />
         </ListItemIcon>
-        Edit
+        Veiw
       </MenuItem>,
       <MenuItem
         key="delete"
         onClick={() => {
-          const selectedRows = table.getSelectedRowModel().flatRows;
-          selectedRows.forEach((row) => table.deleteRow(row.id));
-          closeMenu();
+          handleDelete(params.row.original._id);
+          params.closeMenu();
         }}
         sx={{ m: 0 }}
       >
@@ -183,75 +131,9 @@ const Example = () => {
 
   return (
     <>
-      <Box mb={2} textAlign="right">
-        <Button variant="contained" color="primary" onClick={handleModalOpen}>
-          ADD NEW+
-        </Button>
-      </Box>
       <MaterialReactTable table={table} />
-
-      {/* New Bookink Form */}
-      <Modal open={isModalOpen} onClose={handleModalClose}>
-        <Box
-          sx={{
-            position: "absolute",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            bgcolor: "background.paper",
-            boxShadow: 24,
-            p: 4,
-            width: 400,
-            maxWidth: "90%",
-            maxHeight: "90%",
-            overflowY: "auto",
-          }}
-        >
-          <form>
-            <Typography variant="h5">Add New Bookings</Typography>
-            <TextField
-              variant="standard"
-              label="First Name"
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              variant="standard"
-              label="Last Name"
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              variant="standard"
-              label="Mobile"
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              variant="standard"
-              label="Arrive"
-              fullWidth
-              margin="normal"
-            />
-            <TextField
-              variant="standard"
-              label="Depart"
-              fullWidth
-              margin="normal"
-            />
-            {/* Other fields */}
-            <Button
-              variant="contained"
-              color="primary"
-              onClick={handleModalClose}
-            >
-              Add Booking
-            </Button>
-          </form>
-        </Box>
-      </Modal>
     </>
   );
 };
 
-export default Example;
+export default Bookings;

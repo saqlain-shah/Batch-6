@@ -8,6 +8,7 @@ import authRoute from "./Routes/auth.routes.js";
 import usersRoutes from "./Routes/user.routes.js";
 import hotelsRoutes from "./Routes/hotel.routes.js";
 import roomRoutes from "./Routes/room.routes.js";
+import bookingRoutes from "./Routes/booking.routes.js";
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
 import path from 'path';
@@ -36,11 +37,12 @@ app.post("/api/auth/register", register);
 app.post("/api/auth/login", login);
 
 // Users
-app.use("/api/users", usersRoutes);
+app.use("/api/users", usersRoutes);   
 
 // Hotels
 app.use("/api/hotels", hotelsRoutes);
 app.use("/api/rooms", roomRoutes);
+app.use("/api/booking", bookingRoutes);
 
 const DatabaseConnection = async () => {
   try {
