@@ -14,10 +14,42 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { data } from "./RoomsData";
-import { Delete, Edit } from "@mui/icons-material";
+// import { data } from "./RoomsData";
+import { Edit, Delete, Visibility } from "@mui/icons-material";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
-const Rooms = () => {
+const Room = () => {
+  const Navigate = useNavigate();
+  const [roomList, setRoomList] = useState([]);
+  const [id, setId] = useState("");
+  const [roomData, setRoomData] = useState({
+    title: "",
+    price: "",
+    maxPeople: "",
+    desc: "",
+  });
+
+  const resetForm = () => {
+    setRoomData({
+      title: "",
+      price: "",
+      maxPeople: "",
+      desc: "",
+    });
+  };
+
+  const handleChange = (event) => {
+    const { name, value, type } = event.target;
+    const newValue =
+      type === "checkbox"
+        ? event.target.checked
+        : type === "file"
+        ? event.target.files[0]
+        : value;
+    setRoomData({ ...roomData, [name]: newValue });
+  };
+
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleModalOpen = () => {
@@ -27,6 +59,23 @@ const Rooms = () => {
   const handleModalClose = () => {
     setIsModalOpen(false);
   };
+
+  const fetchRoomsData = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:8000/api/rooms/hotelId"
+      );
+      console.log("data", response.data);
+      response.data.map(
+        (data) => (data.photos = `http://localhost:8000/${data.photos}`)
+      );
+      setRoomList(response.data);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+
 
   const columns = useMemo(
     () => [
@@ -243,4 +292,4 @@ const Rooms = () => {
   );
 };
 
-export default Rooms;
+export default Room;
